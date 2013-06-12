@@ -1,0 +1,61 @@
+@(title: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>@title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="lib/bootstrap/css/docs.css" rel="stylesheet">
+
+    <link href="lib/codemirror/lib/codemirror.css" rel="stylesheet">
+    <link href="lib/codemirror/theme/solarized.css" rel="stylesheet">
+    <link href="scaffold.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+      <script src="lib/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body data-spy="scroll" data-target=".scaffold-sidebar">
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="index.html">Scaffold</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="fundamentals">Fundamentals</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @content
+
+    <footer class="footer">
+      <div class="container">
+        <p>Designed and built with all the love in the world by <a href="http://twitter.com/mergeconflict" target="_blank">@@mergeconflict</a>.</p>
+      </div>
+    </footer>
+
+    <script src="lib/jquery.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.js"></script>
+    <script src="lib/codemirror/lib/codemirror.js"></script>
+    <script src="lib/codemirror/mode/clike/clike.js"></script>
+    <script src="lib/codemirror/addon/edit/closebrackets.js"></script>
+    <script src="lib/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="scaffold.js"></script>
+  </body>
+</html>
