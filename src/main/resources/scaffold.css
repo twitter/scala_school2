@@ -166,34 +166,6 @@ hr.soften {
 }
 
 
-/* Pattern overlay
-------------------------- */
-.jumbotron .container {
-  position: relative;
-  z-index: 2;
-}
-.jumbotron:after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: url(../img/scaffold-masthead-pattern.png) repeat center center;
-  opacity: .4;
-}
-@media
-only screen and (-webkit-min-device-pixel-ratio: 2),
-only screen and (   min--moz-device-pixel-ratio: 2),
-only screen and (     -o-min-device-pixel-ratio: 2/1) {
-
-  .jumbotron:after {
-    background-size: 150px 150px;
-  }
-
-}
-
 /* Masthead (docs home)
 ------------------------- */
 .masthead {
@@ -547,7 +519,7 @@ h2 + .row {
 }
 .scaffold-sidenav .active .icon-chevron-right,
 .scaffold-sidenav .active a:hover .icon-chevron-right {
-  background-image: url(../img/glyphicons-halflings-white.png);
+  background-image: url(/lib/bootstrap/img/glyphicons-halflings-white.png);
   opacity: 1;
 }
 .scaffold-sidenav.affix {

@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   "io.spray"          %  "spray-can"      % "1.2-M8",
   "io.spray"          %  "spray-httpx"    % "1.2-M8",
   "io.spray"          %  "spray-routing"  % "1.2-M8",
+  "org.pegdown"       %  "pegdown"        % "1.3.0",
   "org.scala-lang"    %  "scala-compiler" % "2.10.2"
 )
 
@@ -21,3 +22,5 @@ fork := true
 seq(Revolver.settings: _*)
 
 seq(Twirl.settings: _*)
+
+Twirl.twirlImports := Seq("com.twitter.scaffold._")

@@ -8,17 +8,13 @@ object Scaffold extends App with SimpleRoutingApp {
   implicit val system = akka.actor.ActorSystem("scaffold")
   val console = new Console
 
-  val content = Map(
-    "fundamentals" -> html.fundamentals()
-  )
-
   val route = {
     import spray.http.StatusCodes._
     get {
       path(Segment) {
-        content.get(_) match {
-          case Some(result) => complete { result }
-          case None         => reject
+        Document.render(_) match {
+          case Some(html) => complete { html }
+          case None => reject
         }
       }
     } ~
