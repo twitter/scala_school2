@@ -23,4 +23,4 @@ seq(Revolver.settings: _*)
 
 seq(Twirl.settings: _*)
 
-Twirl.twirlImports := Seq("com.twitter.scaffold._")
+Twirl.twirlImports := Seq("com.twitter.scaffold.Document", "Document._")

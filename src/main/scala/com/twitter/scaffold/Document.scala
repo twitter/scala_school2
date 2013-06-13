@@ -8,23 +8,14 @@ case class Document(title: HeaderNode, lead: Seq[Node], sections: Seq[(HeaderNod
 
 object Document {
 
-  def render(nodes: Seq[Node]): String = (new Renderer).render(nodes)
+  def renderHtml(nodes: Node*): Html   = Html((new markdown.HtmlRenderer).toHtml(nodes))
+  def renderText(nodes: Node*): String = (new markdown.TextRenderer).toText(nodes)
+  def renderHref(nodes: Node*): String = renderText(nodes: _*).replaceAll("\\W+", "-")
 
   def render(name: String): Option[Html] = for {
     text     <- load(name)
     document <- parse(text)
   } yield html.markdown(document)
-
-  private class Renderer extends ToHtmlSerializer(new LinkRenderer) {
-    def render(nodes: Seq[Node]): String = {
-      nodes foreach { _.accept(this) }
-      printer.getString
-    }
-
-    override def visit(node: CodeNode): Unit = {
-      printTag(node, "textarea")
-    }
-  }
 
   private[this] val / = sys.props("file.separator")
   private def load(name: String): Option[Array[Char]] =
@@ -37,7 +28,7 @@ object Document {
     import collection.JavaConverters.asScalaBufferConverter
     import collection.mutable.Buffer
 
-    val root = new PegDownProcessor(Extensions.SMARTYPANTS).parseMarkdown(text)
+    val root = new PegDownProcessor(Extensions.ALL).parseMarkdown(text)
     val sections = Buffer.empty[(HeaderNode, Buffer[Node])]
 
     root.getChildren.asScala foreach {

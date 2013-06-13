@@ -1,42 +1,35 @@
 @(document: Document)
 
-@import org.pegdown.ast._
 @import collection.JavaConverters.asScalaBufferConverter
+@import org.pegdown.ast._
 
-@render(nodes: Node*) = @{ Html(Document.render(nodes)) }
-@renderChildren(node: Node) = @{ render(node.getChildren.asScala: _*) }
-
-@defining(renderChildren(document.title)) { title =>
-  @main(title.body) {
-    <header class="jumbotron subhead">
-      <div class="container">
-        <h1>@title</h1>
-        @render(document.lead: _*)
-      </div>
-    </header>
-
-    <div class="span3 scaffold-sidebar">
-      <ul class="nav nav-list scaffold-sidenav">
-        @for((title, _) <- document.sections) {
-          @defining(renderChildren(title)) { title =>
-            <li><a href="#@title"><i class="icon-chevron-right"></i> @title</a></li>
-          }
-        }
-      </ul>
-    </div>
-
+@main(renderText(document.title)) {
+  <header class="jumbotron subhead">
     <div class="container">
-      <div class="row">
-        <div class="span9">
-          @for((title, content) <- document.sections) {
-            <section id="@renderChildren(title)">
-              <div class="page-header">@render(title)</div>
-              @render(content: _*)
-            </section>
-          }
-        </div>
+      @renderHtml(document.title)
+      @renderHtml(document.lead: _*)
+    </div>
+  </header>
+
+  <div class="span3 scaffold-sidebar">
+    <ul class="nav nav-list scaffold-sidenav">
+      @for((title, _) <- document.sections) {
+        <li><a href="#@renderHref(title)"><i class="icon-chevron-right"></i> @renderText(title.getChildren.asScala: _*)</a></li>
+      }
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="span9">
+        @for((title, content) <- document.sections) {
+          <section id="@renderHref(title)">
+            <div class="page-header">@renderHtml(title)</div>
+            @renderHtml(content: _*)
+          </section>
+        }
       </div>
     </div>
+  </div>
 
-  }
 }

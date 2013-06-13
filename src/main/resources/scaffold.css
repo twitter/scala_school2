@@ -39,6 +39,10 @@
   min-height: 20px;
 }
 
+code {
+  font-size: smaller !important;
+}
+
 /* Body and structure
 -------------------------------------------------- */
 
