@@ -3,8 +3,10 @@
 
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
-      resetButtonTemplate = $('<button class="btn btn-small btn-danger">reset</button>'),
-      outputTemplate = $('<pre class="output"><div></div></pre>');
+      clearButtonTemplate = $('<button class="btn btn-mini">clear</button>'),
+      resetButtonTemplate = $('<button class="btn btn-mini">reset</button>'),
+      buttonGroupTemplate = $('<div class="btn-group"></div>'),
+      outputTemplate = $('<pre class="output"><div class="output"></div></pre>');
 
     $('textarea').each(function (_, e) {
       var
@@ -19,8 +21,10 @@
         }),
         container = $(cm.getWrapperElement()),
         submitButton = submitButtonTemplate.clone(),
+        clearButton = clearButtonTemplate.clone(),
         resetButton = resetButtonTemplate.clone(),
-        output = outputTemplate.clone().append(resetButton);
+        buttonGroup = buttonGroupTemplate.clone().append(clearButton).append(resetButton),
+        output = outputTemplate.clone().append(buttonGroup);
 
         submitButton.click(function() {
           $.ajax({
@@ -29,11 +33,16 @@
             data: cm.getValue(),
           }).done(function (result) {
             output.removeClass('error');
-            $('div', output).text(result);
+            $('div.output', output).text(result);
           }).fail(function (xhr) {
             output.addClass('error');
-            $('div', output).text(xhr.responseText);
+            $('div.output', output).text(xhr.responseText);
           });
+        });
+
+        clearButton.click(function() {
+          output.removeClass('error')
+          $('div.output', output).text('');
         });
 
         resetButton.click(function() {
@@ -43,9 +52,10 @@
           }).done(function () {
             var outputs = $('.output');
             outputs.removeClass('error');
-            $('div', outputs).text('');
-          })
-        })
+            $('div.output', outputs).text('');
+          });
+        });
+
       container.append(submitButton);
       container.after(output);
     });

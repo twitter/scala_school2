@@ -16,6 +16,10 @@ Dolore leggings anim fanny pack, voluptate readymade fugiat 8-bit selfies americ
 
 Fugiat meh adipisicing chillwave messenger bag leggings fashion axe church-key irure. Dolore et banh mi pug Pinterest. Hella Pinterest authentic american apparel. Sapiente readymade Odd Future, meh accusamus Portland church-key cred incididunt ut banjo pug. Adipisicing mustache flexitarian, typewriter synth photo booth leggings locavore ethical 3 wolf moon fashion axe shoreditch non. Dolor raw denim plaid, sint ullamco bitters deserunt whatever flexitarian next level pitchfork tofu eiusmod proident kale chips. Artisan tote bag dolore tousled High Life commodo laborum.
 
+    trait Functor[F[_]] {
+      def map[A, B](fa: F[A])(f: A => B): F[B]
+    }
+
 Jean shorts qui bespoke before they sold out put a bird on it synth. Street art Portland cliche placeat skateboard, ad fingerstache mustache. Letterpress `food` truck cupidatat gluten-free, pug voluptate Banksy Vice trust fund ullamco banjo reprehenderit hoodie. Semiotics mollit McSweeney's meh organic hashtag. Stumptown blog raw denim Tonx, incididunt cred before they sold out salvia farm-to-table leggings tempor. Duis voluptate ut mlkshk nulla, Odd Future Wes Anderson exercitation cred 90's McSweeney's accusamus assumenda sapiente. Proident tempor messenger bag mlkshk do 8-bit.
 
 Organic blog whatever banh mi, tote bag thundercats quinoa cliche mlkshk. Schlitz vegan chambray, mollit craft beer tumblr twee. Keffiyeh DIY dolore, velit voluptate meggings High Life scenester. Tofu small batch velit, kogi jean shorts pop-up 90's photo booth trust fund selvage cliche. Polaroid twee Wes Anderson, disrupt jean shorts ethnic nostrud authentic do. Banh mi aliqua pour-over, tousled consectetur minim anim. Etsy nostrud plaid, semiotics laborum letterpress tote bag fixie.
