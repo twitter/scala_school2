@@ -29,8 +29,8 @@
 
 .btn-group {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
+  bottom: -3px;
+  right: -1px;
   opacity: 0.5;
 }
 
@@ -60,6 +60,14 @@ pre.output div.output {
 
 code {
   font-size: smaller !important;
+}
+
+.dropdown-menu:before {
+  display: none !important;
+}
+
+.dropdown-menu:after {
+  display: none !important;
 }
 
 /* Body and structure

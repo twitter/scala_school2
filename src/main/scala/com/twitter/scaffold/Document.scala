@@ -32,7 +32,7 @@ object Document {
     val sections = Buffer.empty[(HeaderNode, Buffer[Node])]
 
     root.getChildren.asScala foreach {
-      case node: HeaderNode if node.getLevel < 3 =>
+      case node: HeaderNode if node.getLevel == 1 =>
         sections += node -> Buffer.empty[Node]
       case node =>
         sections.lastOption match {

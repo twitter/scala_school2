@@ -1,26 +1,24 @@
 package com.twitter.scaffold
 
 class Console {
-  import java.io._
+  import java.io.ByteArrayOutputStream
   import scala.tools.nsc._
   import interpreter._
 
-  private[this] val writer = new StringWriter
   private[this] val console = new IMain({
     val settings = new Settings
     settings.usejavacp.value = true
     settings
-  }, new PrintWriter(writer))
+  })
 
   def interpret(e: String): Either[String, String] = {
-    writer.getBuffer.setLength(0)
-    val result = console.interpret(e)
-    val output = writer.toString
+    val out = new ByteArrayOutputStream
+    val result = Console.withOut(out) { console.interpret(e) }
 
     import Results._
     result match {
-      case Success => Right(output)
-      case Error | Incomplete => Left(output)
+      case Success => Right(out.toString)
+      case Error | Incomplete => Left(out.toString)
     }
   }
 
