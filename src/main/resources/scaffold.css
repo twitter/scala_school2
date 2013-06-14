@@ -70,6 +70,12 @@ code {
   display: none !important;
 }
 
+.brand img {
+  width: 20px;
+  height: 20px;
+  vertical-align: bottom;
+}
+
 /* Body and structure
 -------------------------------------------------- */
 

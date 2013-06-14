@@ -3,7 +3,7 @@
 @import collection.JavaConverters.asScalaBufferConverter
 @import org.pegdown.ast._
 
-@main(renderText(document.title)) {
+@main("Scala School - " + renderText(document.title)) {
   <header class="jumbotron subhead">
     <div class="container">
       @renderHtml(document.title)

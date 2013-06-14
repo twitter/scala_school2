@@ -11,6 +11,10 @@ object Scaffold extends App with SimpleRoutingApp {
   val route = {
     import spray.http.StatusCodes._
     get {
+      path(Slash) {
+        complete { html.index() }
+      } ~
+      getFromResourceDirectory("") ~
       path(Segment) {
         Document.render(_) match {
           case Some(html) => complete { html }
@@ -18,7 +22,6 @@ object Scaffold extends App with SimpleRoutingApp {
         }
       }
     } ~
-    getFromResourceDirectory("") ~
     post {
       entity(as[String]) {
         console.interpret(_) match {
