@@ -76,6 +76,10 @@ code {
   vertical-align: bottom;
 }
 
+h4 {
+  margin-bottom: 5px !important;
+}
+
 /* Body and structure
 -------------------------------------------------- */
 
