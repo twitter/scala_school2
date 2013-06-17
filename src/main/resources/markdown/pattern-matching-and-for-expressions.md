@@ -134,10 +134,18 @@ Note that, just like all our other control flow so far, `try-catch` is an expres
 
 We've all written this code in some language at least once:
 
+    var i = 0
+    while (i < 10) {
+      println("I'M AWESOME")
+      i = i + 1
+    }
+
+or more succinctly:
+
     for (i <- 0 until 10)
       println("I'M AWESOME")
 
-Fantastic. Now let's say you're trying to do something slightly more useful:
+Fantastic. Now let's say you're trying to do something marginally more useful:
 
     import collection.mutable.Buffer
 
@@ -158,7 +166,7 @@ So we can do better:
     for (word <- quietWords)
       noisyWords += word.toUpperCase
 
-No more explicit indexing, and we're now linear time...
+No more explicit indexing, and we're now linear time, but...
 
 # `for`-expressions
 
@@ -204,6 +212,23 @@ You can also directly assign `val`s inside the `for { ... }`:
     } yield salutation
 
 
-# Patterns run amok!
+# Yo dawg, I herd u like patterns...
 
-TODO
+So I put some patterns in your `for`-expressions so you can match while you loop:
+
+    val quietNumbers = Map(1 -> "one", 2 -> "two", 3 -> "three")
+    val noisyOddNumbers = for {
+      (key, value) <- quietNumbers
+      if key % 2 == 1
+    } yield key -> value.toUpperCase
+
+As it turns out, the left hand sides of the `<-`s in all of the previous examples (e.g. `hello` and `world`) have been variable patterns, but you're not limited to use only variable patterns here. This example shows an extractor pattern matching a `Tuple2`, with two variable patterns inside.
+
+> #### Exercise: reinvent the wheel
+> `Map` has two methods, `keys` and `values`, which can be easily reimplemented using a `for`-expression and some patterns you've seen earlier...
+
+This trick also applies to plain `val` declarations:
+
+    val (headKey, headValue) = quietNumbers.head
+
+Very handy.
