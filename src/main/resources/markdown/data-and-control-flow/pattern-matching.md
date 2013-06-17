@@ -1,6 +1,6 @@
-# Pattern Matching and For-Expressions
+# Pattern Matching
 
-Control flow on steroids, transforming collections with style.
+Branching on steroids.
 
 # `match` expressions and literal patterns
 
@@ -130,105 +130,28 @@ Note that, just like all our other control flow so far, `try-catch` is an expres
 > #### Mega Combo Bonus: `Option`
 > If `defensiveToInt` produces the value `0`, we don't know whether it was because the input was the string `"0"` or a non-number. Scala has a data type called `Option` which disambiguates; use it.
 
-# `for`-loops
+# Yo dawg, I herd u like patterns...
 
-We've all written this code in some language at least once:
-
-    var i = 0
-    while (i < 10) {
-      println("I'M AWESOME")
-      i = i + 1
-    }
-
-or more succinctly:
-
-    for (i <- 0 until 10)
-      println("I'M AWESOME")
-
-Fantastic. Now let's say you're trying to do something marginally more useful:
-
-    import collection.mutable.Buffer
-
-    val quietWords = List("let's", "transform", "some", "collections")
-    val noisyWords = Buffer.empty[String]
-    for (i <- 0 until quietWords.size)
-      noisyWords += quietWords(i).toUpperCase
-
-There are a few truly awful things about this code:
-
-* Explicitly indexing into the list is prone to bugs; you're likely to have an off-by-one error or accidentally use the wrong index variable in the wrong collection.
-* The time complexity of this algorithm is O(n<sup>2</sup>), because indexing into a `List` is a linear-time operation, not constant-time (note: if we used a more appropriate collection type, such as `Vector`, this wouldn't be an issue).
-* It's not nearly DRY enough: `noisyWords` appears two times and `quietWords` appears three times.
-
-So we can do better:
-
-    val noisyWords = Buffer.empty[String]
-    for (word <- quietWords)
-      noisyWords += word.toUpperCase
-
-No more explicit indexing, and we're now linear time, but...
-
-# `for`-expressions
-
-The mutable `Buffer`-based approach is still dissatisfying. We've been doing very well treating control flow structures as value-producing expressions so far, so why not here?
-
-    val noisyWords = for (word <- quietWords) yield
-      word.toUpperCase
-
-Aha, immutable and DRY. The `for-yield` expression indicates _transformation_: it directly produces a new collection, where each element is transformed from a corresponding element in the original collection. The behavior varies depending on the type of the original collection, but in this case where you start with a `List[String]`, the `for-yield` expression produces a `List[String]` in the order you'd expect. In many other programming languages, this is referred to as "list comprehensions."
-
-> #### Note for Java refugees
-> The `yield` keyword has nothing to do with Java's `Thread.yield()` method. In fact, since `yield` is a reserved keyword in Scala, if you want to call that method, you have to write ``Thread.`yield`()`` instead. Surrounding the keyword in backticks forces it to be parsed as an identifier.
-
-One nice thing about `for`-loops and `for`-expressions is that they can contain multiple _generators_, producing a similar effect to nested loops:
-
-    val salutations = for (hello <- List("hello", "greetings"); world <- List("world", "interwebs")) yield
-      "%s %s!".format(hello, world)
-
-This syntax starts to get a bit clunky, the more generators you have, so Scala provides an alternative syntax:
+So I put some patterns in your `for`-expressions so you can match while you loop. Remember this example?
 
     val salutations = for {
       hello <- List("hello", "greetings")
       world <- List("world", "interwebs")
     } yield "%s %s!".format(hello, world)
 
-This is a bit confusing-looking at first, since the braces look like they're delineating a block of statements. It's not difficult to get used to, though, and it's the recommended style when you have multiple generators.
-
-You can also directly assign `val`s inside the `for { ... }`:
-
-    val salutations = for {
-      hello <- List("hello", "greetings")
-      world <- List("world", "interwebs")
-      salutation = "%s %s!".format(hello, world)
-    } yield salutation
-
-... which isn't terribly useful by itself, but becomes very handy when you need to _filter_ some of the results:
-
-    val salutations = for {
-      hello <- List("hello", "greetings")
-      world <- List("world", "interwebs")
-      salutation = "%s %s!".format(hello, world)
-      if salutation.length < 20 // tl;dr
-    } yield salutation
-
-
-# Yo dawg, I herd u like patterns...
-
-So I put some patterns in your `for`-expressions so you can match while you loop:
+In this example, `hello` and `world` are actually both variable patterns, and in fact the left hand side of the `<-`s in `for`-expressions are always some sort of pattern. This example shows an extractor pattern matching a `Tuple2`, with two variable patterns inside:
 
     val quietNumbers = Map(1 -> "one", 2 -> "two", 3 -> "three")
     val noisyOddNumbers = for {
-      (key, value) <- quietNumbers
+      (key, value) <- quietNumbers // extractor pattern!
       if key % 2 == 1
     } yield key -> value.toUpperCase
-
-As it turns out, the left hand sides of the `<-`s in all of the previous examples (e.g. `hello` and `world`) have been variable patterns, but you're not limited to use only variable patterns here. This example shows an extractor pattern matching a `Tuple2`, with two variable patterns inside.
 
 > #### Exercise: reinvent the wheel
 > `Map` has two methods, `keys` and `values`, which can be easily reimplemented using a `for`-expression and some patterns you've seen earlier...
 
-This trick also applies to plain `val` declarations:
+This trick even applies to plain `val` declarations:
 
     val (headKey, headValue) = quietNumbers.head
 
-Very handy.
+Pattern matching is one of the most powerful constructs provided by Scala, so it's often good engineering practice to model your problem domain by decomposition into cases. This becomes especially compelling when paired with [case classes](/object-oriented-programming/apply-unapply-and-case-classes), which you'll see in the next lesson.

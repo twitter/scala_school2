@@ -23,6 +23,4 @@ class Console {
   }
 
   def reset(): Unit = console.reset()
-
-  reset() // warm prior to use
 }

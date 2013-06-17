@@ -62,14 +62,6 @@ code {
   font-size: smaller !important;
 }
 
-.dropdown-menu:before {
-  display: none !important;
-}
-
-.dropdown-menu:after {
-  display: none !important;
-}
-
 .brand img {
   width: 20px;
   height: 20px;

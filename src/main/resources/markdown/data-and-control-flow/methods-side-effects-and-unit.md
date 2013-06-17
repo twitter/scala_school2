@@ -21,6 +21,35 @@ Since we know `a` and `b` are both `Int`, the expression `a + b` must be `Int`, 
     import util.Random._
     def contrived(a: Int, b: String) = if (nextBoolean()) a else b
 
+# Named and default arguments
+
+When calling a method, you don't have to pass the arguments in the order they're declared in the method parameter list; you can use named arguments instead:
+
+    def formatUser(userId: Long, userName: String, realName: String): String =
+      "%s <%d>: %s".format(userName, userId, realName)
+
+    formatUser(
+      realName = "Dan Rosen",
+      userName = "drosen",
+      userId = 31337
+    )
+
+> #### Note for C refugees
+> Don't use terrible names for your method parameters. In Scala, those names are part of your public API, not just implementation detail.
+
+When calling a method that takes many parameters (many of which might have the same type), it's nice to be explicit at the call sites about which parameter is bound to which argument. This provides useful documentation for anybody reading the code, and some degree of future-proofing against API changes.
+
+Named arguments also allow us to provide defaults:
+
+    def formatUser(
+        userId: Long = 0,
+        userName: String = "unknown",
+        realName: String = "Unknown"
+      ): String =
+      "%s <%d>: %s".format(userName, userId, realName)
+
+    formatUser(userName = "drosen")
+
 # Explicit type ascriptions
 
 Even though you can usually omit method result type ascriptions, most of the time it's good practice to include them, because:

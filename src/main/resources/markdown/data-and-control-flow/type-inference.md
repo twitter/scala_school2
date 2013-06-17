@@ -31,7 +31,7 @@ What type is inferred here, if the types don't quite line up?
 
 We have to look at Scala's **type lattice** (informally, a class hierarchy where all classes have both a common superclass---like `Object` in Java---as well as a common subclass) to find the closest common ancestor of the two sub-expression types:
 
-![lol](img/type-lattice.png)
+![lol](/img/type-lattice.png)
 
 The `AnyVal` types correspond to the JVM's primitive types, and the `AnyRef` types correspond to the JVM's object and array types. Note that the grey arrows in this diagram don't represent actual subclass relationships, just convertibility ("weak conformance"). So the LUB of `1: Int` and `'a': Char` is `Int` by weak conformance, the LUB of `1: Int` and `true: Boolean` is `AnyVal`, and the LUB of `1: Int` and `"tastes great": String` is `Any`.
 

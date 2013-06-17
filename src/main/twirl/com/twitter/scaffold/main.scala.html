@@ -9,12 +9,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/lib/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
-    <link href="lib/codemirror/lib/codemirror.css" rel="stylesheet">
-    <link href="lib/codemirror/theme/solarized.css" rel="stylesheet">
-    <link href="scaffold.css" rel="stylesheet">
+    <link href="/lib/codemirror/lib/codemirror.css" rel="stylesheet">
+    <link href="/lib/codemirror/theme/solarized.css" rel="stylesheet">
+    <link href="/scaffold.css" rel="stylesheet">
 
     <!--[if lt IE 9]>
       <script src="lib/html5shiv.js"></script>
@@ -31,22 +31,37 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="/"><img src="img/twitter-bird-dark-bgs.png"> Scala School</a>
+          <a class="brand" href="/"><img src="/img/twitter-bird-dark-bgs.png"> Scala School</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">Data and Control Flow</a>
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Data and Control Flow <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="variable-declarations-and-expressions">Variables and Expressions</a></li>
-                  <li><a href="type-inference">Type Inference</a></li>
-                  <li><a href="methods-side-effects-and-unit">Methods, Side Effects and Unit</a></li>
-                  <li><a href="pattern-matching-and-for-expressions">Pattern Matching and For-Expressions</a></li>
+                  <li><a href="/data-and-control-flow/variable-declarations-and-expressions">Variables and Expressions</a></li>
+                  <li><a href="/data-and-control-flow/type-inference">Type Inference</a></li>
+                  <li><a href="/data-and-control-flow/methods-side-effects-and-unit">Methods, Side Effects and Unit</a></li>
+                  <li><a href="/data-and-control-flow/for-expressions">For-Expressions</a></li>
+                  <li><a href="/data-and-control-flow/pattern-matching">Pattern Matching</a></li>
                 </ul>
               </li>
-              <li><a href="object-oriented-programming">Object-Oriented Programming</a></li>
-              <li><a href="introduction-to-generics">Introduction to Generics</a></li>
-              <li><a href="functional-programming">Functional Programming</a></li>
-              <li><a href="design-patterns">Design Patterns</a></li>
-              <li><a href="monads">Monads</a></li>
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Object-Oriented Programming <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/object-oriented-programming/classes-and-objects">Classes and Objects</a></li>
+                  <li><a href="/object-oriented-programming/apply-unapply-and-case-classes">Apply, Unapply and Case Classes</a></li>
+                  <li><a href="/object-oriented-programming/abstract-classes-and-traits">Abstract Classes and Traits</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Generics and Functional Programming <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/generics-and-functional-programming/introduction-to-generics">Introduction to Generics</a></li>
+                  <li><a href="/generics-and-functional-programming/functional-programming">Functional Programming</a></li>
+                </ul>
+              </li>
+              <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Design Patterns <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/design-patterns/design-patterns">Design Patterns</a></li>
+                  <li><a href="/design-patterns/monads">Monads</a></li>
+                </ul>
+              </li>
             </ul>
           </div>
         </div>
@@ -61,12 +76,12 @@
       </div>
     </footer>
 
-    <script src="lib/jquery.js"></script>
-    <script src="lib/bootstrap/js/bootstrap.js"></script>
-    <script src="lib/codemirror/lib/codemirror.js"></script>
-    <script src="lib/codemirror/mode/clike/clike.js"></script>
-    <script src="lib/codemirror/addon/edit/closebrackets.js"></script>
-    <script src="lib/codemirror/addon/edit/matchbrackets.js"></script>
-    <script src="scaffold.js"></script>
+    <script src="/lib/jquery.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.js"></script>
+    <script src="/lib/codemirror/lib/codemirror.js"></script>
+    <script src="/lib/codemirror/mode/clike/clike.js"></script>
+    <script src="/lib/codemirror/addon/edit/closebrackets.js"></script>
+    <script src="/lib/codemirror/addon/edit/matchbrackets.js"></script>
+    <script src="/scaffold.js"></script>
   </body>
 </html>

@@ -15,7 +15,7 @@ object Scaffold extends App with SimpleRoutingApp {
         complete { html.index() }
       } ~
       getFromResourceDirectory("") ~
-      path(Segment) {
+      path(Rest) {
         Document.render(_) match {
           case Some(html) => complete { html }
           case None => reject
