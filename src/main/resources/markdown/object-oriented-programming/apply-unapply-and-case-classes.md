@@ -4,6 +4,70 @@ Nihil veniam vegan intelligentsia lomo nulla. Single-origin coffee flannel tousl
 
 # Banksy next level ex
 
-Put a bird on it biodiesel kogi cardigan aliquip pickled Brooklyn thundercats. Selfies post-ironic fap id, Cosby sweater helvetica elit tote bag Vice aliquip cred. Ennui do labore cliche, narwhal sint irony eu freegan raw denim Austin. Authentic fingerstache id, banh mi polaroid post-ironic literally Portland skateboard umami. Church-key Carles aute, culpa accusamus shoreditch bicycle rights messenger bag. Fingerstache kitsch plaid laboris synth skateboard. Meh odio sed, nisi eu skateboard meggings dreamcatcher intelligentsia gentrify wayfarers biodiesel yr lo-fi ad.
+what's special about List
 
-Tonx retro dolor, deep v ennui art party locavore. Odio kale chips ut, accusamus before they sold out est mixtape Marfa brunch kitsch pug. Leggings adipisicing esse, jean shorts exercitation fugiat chambray VHS kogi occupy narwhal laborum Williamsburg kitsch. Eu raw denim mustache pug odio YOLO. Aesthetic quinoa voluptate trust fund 3 wolf moon, art party ennui hashtag. Assumenda DIY kale chips consequat deep v, culpa labore proident. Voluptate cupidatat post-ironic, Terry Richardson nisi sartorial artisan veniam Schlitz Bushwick semiotics sint excepteur.
+    val list = List(1, 2, 3) // why no new?
+
+`apply` method.
+
+    class Recipe(val ingredients: List[String], val directions: List[String])
+    object Recipe {
+      def apply(
+          ingredients: List[String] = List.empty,
+          directions: List[String] = List.empty): Recipe =
+        new Recipe(ingredients, directions)
+    }
+
+why can we do this?
+
+    def isThreeElementList(a: Any): Boolean = a match {
+      case List(_, _, _) => true
+      case _             => false
+    }
+
+`unapply` method.
+
+    class Recipe(val ingredients: List[String], val directions: List[String])
+    object Recipe {
+      def apply(
+          ingredients: List[String] = List.empty,
+          directions: List[String] = List.empty): Recipe =
+        new Recipe(ingredients, directions)
+
+      def unapply(recipe: Recipe): Option[(List[String], List[String])] =
+        if (recipe eq null) None
+        else Some((recipe.ingredients, recipe.directions))
+    }
+
+> #### Note: equality
+> reference vs value equality. note that recipes aren't currently `==`.
+
+OMG backwards-looking:
+
+    val pbj = new Recipe(
+      ingredients = List("peanut butter", "jelly", "bread"),
+      directions = List("put the peanut butter and jelly on the bread"))
+
+    val baconPancakes = new Recipe(
+      ingredients = List("bacon", "pancakes"),
+      directions = List("take some bacon", "put it in a pancake"))
+
+    def containsNuts(recipe: Recipe): Boolean = recipe match {
+      case Recipe(ingredients, _) => ingredients exists { _ containsSlice("nut") }
+    }
+
+    def isSimple(recipe: Recipe): Boolean = recipe match {
+      case Recipe(_, List(_)) => true
+      case _                  => false
+    }
+
+> #### Exercise: `String` - `Int` extractor
+> Create an object `ContainsInt` to safely parse an `Int` from a `String`.
+
+Use unapply to encapsulate/reuse branching logic.
+
+OMG boilerplate: apply/unapply, equals/hashCode, toString, copy, ...
+
+    case class Recipe(ingredients: List[String], directions: List[String])
+
+This is a huge win.

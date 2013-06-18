@@ -1,6 +1,6 @@
 # Variables and Expressions
 
-Learn to declare variables and values, write and execute statements and compose expressions.
+Declaring variables and values, executing statements and composing expressions.
 
 # Mutable variables: `var`
 
