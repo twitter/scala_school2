@@ -10,7 +10,7 @@ object Document {
 
   def renderHtml(nodes: Node*): Html   = Html((new markdown.HtmlRenderer).toHtml(nodes))
   def renderText(nodes: Node*): String = (new markdown.TextRenderer).toText(nodes)
-  def renderHref(nodes: Node*): String = renderText(nodes: _*).replaceAll("\\W+", "-")
+  def renderHref(nodes: Node*): String = renderText(nodes: _*).replaceAll("\\W+", "-").toLowerCase
 
   def render(name: String): Option[Html] = for {
     text     <- load(name)

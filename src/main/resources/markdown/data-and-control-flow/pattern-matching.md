@@ -15,22 +15,20 @@ Old and busted branching:
 
 New hotness branching:
 
-    def monthName(n: Int): String =
-      n match {
-        case 1 => "January"
-        case 2 => "February"
-        case 3 => "March"
-        // ...
-      }
+    def monthName(n: Int): String = n match {
+      case 1 => "January"
+      case 2 => "February"
+      case 3 => "March"
+      // ...
+    }
 
 Wait, this looks suspiciously like `switch-case` from C. But notice that there's no `break` statement needed, to prevent falling through to subsequent cases (sorry, no [Duff's device](http://en.wikipedia.org/wiki/Duff's_device) in Scala). If you want multiple cases to correspond to a single output, there's a very convenient syntax:
 
-    def daysInMonth(n: Int): Int =
-      n match {
-        case 1 | 3 | 5 | 7 | 8 | 10 | 12 => 31
-        case 4 | 6 | 9 | 11 => 30
-        case 2 => 28
-      }
+    def daysInMonth(n: Int): Int = n match {
+      case 1 | 3 | 5 | 7 | 8 | 10 | 12 => 31
+      case 4 | 6 | 9 | 11 => 30
+      case 2 => 28
+    }
 
 The values appearing on the left hand side of the `=>` are called "literal patterns."
 
@@ -49,33 +47,31 @@ Pattern matching is more powerful than `switch-case`, because it can introduce n
 
 You can also combine this with type ascriptions to provide safe down-casting:
 
-    def whatIs(a: Any): String =
-      a match {
-        case n: Int =>
-          val evenOrOdd = if (n % 2 == 0) "even" else "odd"
-          "the %s number %d".format(evenOrOdd, n)
-        case s: String =>
-          val englishOrNot = if (s forall { '\u0020' to '\u007F' contains _ }) "probably english" else ""
-          "the %s string %s".format(englishOrNot, s)
-        case _ =>
-          "something else"
-      }
+    def whatIs(a: Any): String = a match {
+      case n: Int =>
+        val evenOrOdd = if (n % 2 == 0) "even" else "odd"
+        "the %s number %d".format(evenOrOdd, n)
+      case s: String =>
+        val englishOrNot = if (s forall { '\u0020' to '\u007F' contains _ }) "probably english" else ""
+        "the %s string %s".format(englishOrNot, s)
+      case _ =>
+        "something else"
+    }
 
 This can be written differently with _pattern guards_ (which sort of look like `if-else` expressions, but aren't):
 
-    def whatIs(a: Any): String =
-      a match {
-        case n: Int if n % 2 == 0 =>
-          "the even number " + n
-        case n: Int =>
-          "the odd number " + n
-        case s: String if s forall { '\u0020' to '\u007F' contains _ } =>
-          "the probably english string " + s
-        case s: String =>
-          "the string " + s
-        case _ =>
-          "something else"
-      }
+    def whatIs(a: Any): String = a match {
+      case n: Int if n % 2 == 0 =>
+        "the even number " + n
+      case n: Int =>
+        "the odd number " + n
+      case s: String if s forall { '\u0020' to '\u007F' contains _ } =>
+        "the probably english string " + s
+      case s: String =>
+        "the string " + s
+      case _ =>
+        "something else"
+    }
 
 Notice that the first pattern to match, in order from top to bottom, wins.
 
@@ -83,17 +79,16 @@ Notice that the first pattern to match, in order from top to bottom, wins.
 
 Pattern matching is most compelling when used to _extract_ features from various data structures. For example:
 
-    def whatIs(a: Any): String =
-      a match {
-        case (x, y, z) =>
-          "a Tuple3 containing %s, %s and %s".format(x, y, z)
-        case List(x, y, z, _*) =>
-          "a List containing three or more elements, starting with: %s, %s and %s".format(x, y, z)
-        case List((x1, y1), (x2, y2)) =>
-          "a List containing exactly two Tuple2s: %s -> %s, %s -> %s".format(x1, y1, x2, y2)
-        case _ =>
-          "something else"
-      }
+    def whatIs(a: Any): String = a match {
+      case (x, y, z) =>
+        "a Tuple3 containing %s, %s and %s".format(x, y, z)
+      case List(x, y, z, _*) =>
+        "a List containing three or more elements, starting with: %s, %s and %s".format(x, y, z)
+      case List((x1, y1), (x2, y2)) =>
+        "a List containing exactly two Tuple2s: %s -> %s, %s -> %s".format(x1, y1, x2, y2)
+      case _ =>
+        "something else"
+    }
 
 > #### Exercise: moar!
 > This example composes two different kinds of patterns. Identify them, and expand the example to include literal and typed patterns as well.
@@ -108,12 +103,11 @@ This code probably behaves badly:
 
 An _exception_ unwinds the call stack, from the frame in which it's thrown to the nearest enclosing `catch` block. When you anticipate the possibility of one or more kinds of exceptions (for example, because you're validating possibly malicious user input, or because you're trying to connect to a possibly unavailable server), you can pattern match against those exceptions:
 
-    def defensiveToInt(s: String): Int =
-      try {
-        s.toInt
-      } catch {
-        case _: NumberFormatException => 0
-      }
+    def defensiveToInt(s: String): Int = try {
+      s.toInt
+    } catch {
+      case _: NumberFormatException => 0
+    }
 
 Note that, just like all our other control flow so far, `try-catch` is an expression that produces a value and runtime and has a type at compile time. The static type is the LUB of the types of the `try` block and all of the `case` clauses.
 

@@ -123,6 +123,13 @@ When a class and an object are defined with the same name, in the same source fi
 
     class Recipe private (val ingredients: List[String], val directions: List[String])
     object Recipe {
+      val pbj = new Recipe(
+        ingredients = List("peanut butter", "jelly", "bread"),
+        directions = List("put the peanut butter and jelly on the bread"))
+      val baconPancakes = new Recipe(
+        ingredients = List("bacon", "pancakes"),
+        directions = List("take some bacon", "put it in a pancake"))
+
       def make(ingredients: List[String], directions: List[String]): Option[Recipe] =
         if (ingredients.isEmpty || directions.isEmpty)
           None
@@ -133,4 +140,4 @@ When a class and an object are defined with the same name, in the same source fi
 The `Recipe` class constructor here is `private`---other code can't directly instantiate a `new Recipe`---but because the `Recipe` object is a companion, it can (this is somewhat similar to `friend` in C++).
 
 > #### Note: access modifiers
-> This is the first time we've seen `private`. You can annotate fields and methods to be `private` as well. There's also `protected`, but no `public`: everything is publicly accessible by default. This is actually pretty reasonable, considering we generally prefer `val` and immutable data structures, unlike in most other object-oriented languages where `private` encapsulation is absolutely necessary to prevent unwanted mutation.
+> This is the first time we've seen `private` (on a primary constructor, no less)! You can annotate fields and methods to be `private` as well. There's also `protected`, but no `public`: everything is publicly accessible by default. This is actually pretty reasonable, considering we generally prefer `val` and immutable data structures, unlike in most other object-oriented languages where `private` encapsulation is absolutely necessary to prevent unwanted mutation.
