@@ -1,15 +1,12 @@
-Contributing
-============
+# Contributing
 
 [![Build Status](https://travis-ci.org/twitter/scala_school2.png?branch=master)](https://travis-ci.org/twitter/scala_school2)
 
-Workflow
---------
+## Workflow
 
 We use GitHub's normal [fork-and-pull](https://help.github.com/articles/using-pull-requests#fork--pull) collaboration model, which usually works like this:
 
-Initial setup
-~~~~~~~~~~~~~
+### Initial setup
 
 1. [Fork](https://help.github.com/articles/fork-a-repo) the [main Scala School 2 repository](https://github.com/twitter/scala_school2) from the Twitter account to your personal account.
 
@@ -25,8 +22,7 @@ Initial setup
     git remote add upstream git@github.com:twitter/scala_school2.git
     ```
 
-For each pull request
-~~~~~~~~~~~~~~~~~~~~~
+### For each pull request
 
 1. Pull the latest changes from `upstream/master` (Twitter's repo) into your local `master` branch:
 
@@ -51,8 +47,7 @@ For each pull request
 
 4. The new branch will then appear in your GitHub repository, along with a helpful suggestion to "compare & pull request." [Do it](https://help.github.com/articles/using-pull-requests)! It should probably reference an issue number in our [issue tracker](https://github.com/twitter/scala_school2/issues?state=open), like: `fix #123: teach all the scalas`.
 
-Rapid Development
------------------
+## Rapid Development
 
 Since the server doesn't automatically pick up code or resource changes on the fly when using `sbt run`, it's typically handiest to use the [sbt-revolver](https://github.com/spray/sbt-revolver) plugin instead; this is already configured in the project. From within the `sbt` console, invoke:
 
