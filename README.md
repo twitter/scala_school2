@@ -1,6 +1,8 @@
 # Scala School 2
 
-The goal of Scala School 2 is to provide organized, interactive, reference-quality material for learning the Scala language.
+The goal of Scala School 2 is to provide organized, interactive, reference-quality material for learning the Scala language. It is implemented as a self-contained, locally running web server, which serves book-style material along with live, editable and runnable code snippets. This is intended both for self-paced study as well as for classroom-style lecture and group exercise.
+
+We aim to eventually provide this as a high availability public service, hosted by Twitter, for people everywhere to learn Scala. Currently, however, this is a *very bad idea* for technical reasons: the underlying Scala interpreter is not sandboxed (see issues [#6](https://github.com/twitter/scala_school2/issues/6) and [#7](https://github.com/twitter/scala_school2/issues/7)). So, for now, please download the project and run it locally.
 
 ## Running
 
@@ -24,5 +26,7 @@ All original code in Scala School 2 is provided under the [Apache License, Versi
 
 ## Real Talk, Special Thanks
 
-* Gratitude to Marko Gargenta ([@markogargenta](https://twitter.com/MarkoGargenta)), Saša Gargenta ([@agargenta](https://twitter.com/agargenta)) and Rob Nikzad from **[Marakana](http://marakana.com/)**, the best open-source technology training company in the world, who incubated the initial portions of the Scala School 2 content for customized, on-location training.
-* Martin Odersky ([@odersky](https://twitter.com/odersky)), Paul Phillips ([@extempore2](https://twitter.com/extempore2)), Iulian Dragos ([@jaguarul](https://twitter.com/jaguarul)), Philipp Haller ([@philippkhaller](https://twitter.com/philippkhaller)), Adriaan Moors ([@adriaanm](https://twitter.com/adriaanm)) and contributors to the **[Scala](http://www.scala-lang.org/)** programming language (BSD license).
+* Marko Gargenta ([@markogargenta](https://twitter.com/MarkoGargenta)), Saša Gargenta ([@agargenta](https://twitter.com/agargenta)) and Rob Nikzad from **[Marakana](http://marakana.com/)**, the best open-source technology training company in the world, who incubated the initial portions of the Scala School 2 content for customized, on-location training.
+* Marius Eriksen ([@marius](https://twitter.com/marius)), Larry Hosken ([@lahosken](https://twitter.com/lahosken)), Steve Jensen ([@stevej](https://twitter.com/stevej)), Jeff Sarnat ([@eigenvariable](https://twitter.com/eigenvariable)) and many others at Twitter for their work on the several incarnations of Scala School preceding this.
+* Martin Odersky ([@odersky](https://twitter.com/odersky)), Paul Phillips ([@extempore2](https://twitter.com/extempore2)), Iulian Dragos ([@jaguarul](https://twitter.com/jaguarul)), Philipp Haller ([@philippkhaller](https://twitter.com/philippkhaller)), Adriaan Moors ([@adriaanm](https://twitter.com/adriaanm)) and contributors to the **[Scala](http://www.scala-lang.org/)** programming language.
+* The many members of the greater Scala community who come together and speak at conferences every year, sharing their diverse and often conflicting viewpoints and experiences, to influence our understanding and appreciation for this powerful language. Fair warning: if we ever write a book, some of y'all are getting called out by name for your contributions.
