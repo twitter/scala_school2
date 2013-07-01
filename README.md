@@ -19,6 +19,7 @@ Shout Outs
 * Mathias Doenitz ([@sirthias](https://twitter.com/sirthias)), Johannes Rudolph ([@virtualvoid](https://twitter.com/virtualvoid)) and contributors to:
   * The **[Spray](http://spray.io/)** REST/HTTP toolkit for [Akka](http://akka.io/) (Apache 2 license)
   * The **[Twirl](https://github.com/spray/twirl)** SBT plugin, providing simple stand-alone use of the [Play 2.0 template engine](http://www.playframework.com/documentation/2.0/ScalaTemplates) (Apache 2 license)
+  * The **[Revolver](https://github.com/spray/sbt-revolver)** SBT plugin, to make development not suck (Apache 2 license)
   * The **[Pegdown](https://github.com/sirthias/pegdown)** [Markdown](http://daringfireball.net/projects/markdown/) processor (Apache 2 license)
 * Marijn Haverbeke ([@marijnh](https://twitter.com/marijnjh)) and contributors to the **[CodeMirror](http://codemirror.net/)** text editor component (MIT license)
 * Mark Otto ([@mdo](https://twitter.com/mdo)), Jacob Thornton ([@fat](https://twitter.com/fat)) and contributors to the **[Bootstrap](http://twitter.github.io/bootstrap/)** framework (Apache 2 license)
