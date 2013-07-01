@@ -1,3 +1,7 @@
+> ### OMG spoilers
+>
+> This project has not yet been publicly announced. Not that there's anything particularly scary here, but it's still full of [hipster ipsum](http://hipsteripsum.me/) and isn't ready for primetime. For now: the first rule of Scala School is **you do not talk about Scala School**. Don't share links here just yet; we'll announce soon.
+
 # Scala School 2
 
 The goal of Scala School 2 is to provide organized, interactive, reference-quality material for learning the Scala language. It is implemented as a self-contained, locally running web server, which serves book-style material along with live, editable and runnable code snippets. This is intended both for self-paced study as well as for classroom-style lecture and group exercise.
