@@ -14,6 +14,9 @@ object Scaffold extends App with SimpleRoutingApp {
       path(Slash) {
         complete { html.index() }
       } ~
+      pathPrefix("lib") {
+        getFromResourceDirectory("META-INF/resources/webjars")
+      } ~
       getFromResourceDirectory("") ~
       path(Rest) {
         Document.render(_) match {
