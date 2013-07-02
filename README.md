@@ -26,7 +26,8 @@ All original code in Scala School 2 is provided under the [Apache License, Versi
 * Marijn Haverbeke ([@marijnh](https://twitter.com/marijnjh)) and contributors to the **[CodeMirror](http://codemirror.net/)** text editor component (MIT license)
 * Mark Otto ([@mdo](https://twitter.com/mdo)), Jacob Thornton ([@fat](https://twitter.com/fat)) and contributors to the **[Bootstrap](http://twitter.github.io/bootstrap/)** framework (Apache 2 license)
 * John Resig ([@jeresig](https://twitter.com/jeresig)), Dave Methvin ([@davemethvin](https://twitter.com/davemethvin)) and contributors to the **[jQuery](http://jquery.com/)** JavaScript library (MIT license)
-* Jan Kovařík ([@jankovarik](https://twitter.com/jankovarik)) for [GLYPHICONS](http://glyphicons.com/) (CC BY 3.0)
+* Jan Kovařík ([@jankovarik](https://twitter.com/jankovarik)) for **[GLYPHICONS](http://glyphicons.com/)** (CC BY 3.0)
+* Alexandar Farkas and contributors to **[html5shiv](https://github.com/aFarkas/html5shiv)** (MIT and GPL2 licensed)
 
 ## Real Talk, Special Thanks
 
