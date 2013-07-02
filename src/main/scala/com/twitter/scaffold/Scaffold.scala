@@ -1,12 +1,10 @@
 package com.twitter.scaffold
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.{ Actor, ActorRef }
 import spray.http.StatusCodes.{ BadRequest, NoContent }
-import spray.routing.{ Directives, HttpService, RequestContext, Route }
+import spray.routing.HttpService
 
 class Scaffold(val console: ActorRef) extends Actor with HttpService {
-  import Scaffold._
-
   /* HttpService */
   override val actorRefFactory = context
 
@@ -36,10 +34,12 @@ class Scaffold(val console: ActorRef) extends Actor with HttpService {
 
   private[this] val consoleRoute =
     post {
-      entity(as[String]) { expression => ctx =>
-        // TODO #38: ctx should stay hidden as much as possible...
-        val continuation = actorRefFactory.actorOf(Props(classOf[ConsoleContinuation], ctx))
-        console ! Console.Interpret(expression, continuation)
+      import com.twitter.spray._
+      entity(as[String]) {
+        Console.Interpret(_) ~> console ~> {
+          case Console.Success(message) => complete { message }
+          case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+        }
       }
     } ~
     delete {
@@ -48,23 +48,5 @@ class Scaffold(val console: ActorRef) extends Actor with HttpService {
         NoContent
       }
     }
-
-}
-
-object Scaffold {
-
-  // TODO #38: there must be a better way to structure this...
-  private class ConsoleContinuation(ctx: RequestContext) extends Actor {
-    import Directives._
-    def receive = {
-      case Console.Success(message) => continue { complete { message } }
-      case Console.Failure(message) => continue { respondWithStatus(BadRequest) { complete { message } } }
-    }
-
-    private[this] def continue(route: Route): Unit =
-      try route(ctx)
-      catch { case util.control.NonFatal(e) ⇒ ctx.failWith(e) }
-      finally context.stop(self)
-  }
 
 }
