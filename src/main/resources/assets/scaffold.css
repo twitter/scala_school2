@@ -553,7 +553,7 @@ h2 + .row {
 }
 .scaffold-sidenav .active .icon-chevron-right,
 .scaffold-sidenav .active a:hover .icon-chevron-right {
-  background-image: url(/lib/bootstrap/img/glyphicons-halflings-white.png);
+  background-image: url(/assets/bootstrap/img/glyphicons-halflings-white.png);
   opacity: 1;
 }
 .scaffold-sidenav.affix {
