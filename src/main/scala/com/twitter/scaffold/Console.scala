@@ -1,6 +1,6 @@
 package com.twitter.scaffold
 
-import akka.actor.{ Actor, ActorRef }
+import akka.actor.Actor
 
 class Console extends Actor {
   import Console._
@@ -16,14 +16,14 @@ class Console extends Actor {
   })
 
   def receive = {
-    case Interpret(expression, continuation) =>
+    case Interpret(expression) =>
       val out = new ByteArrayOutputStream
       val result = scala.Console.withOut(out) { console.interpret(expression) }
       val response = result match {
         case Results.Success => Success(out.toString)
         case Results.Error | Results.Incomplete => Failure(out.toString)
       }
-      continuation ! response
+      sender ! response
     case Reset =>
       console.reset()
   }
@@ -32,7 +32,7 @@ class Console extends Actor {
 object Console {
 
   // requests
-  case class Interpret(expression: String, continuation: ActorRef)
+  case class Interpret(expression: String)
   case object Reset
 
   // responses
