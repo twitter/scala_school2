@@ -1,6 +1,6 @@
 package com.twitter.scaffold
 
-import akka.actor.Actor
+import akka.actor.{ Actor, Props }
 
 class Console extends Actor {
   import Console._
@@ -30,6 +30,8 @@ class Console extends Actor {
 }
 
 object Console {
+
+  val props = Props[Console]
 
   // requests
   case class Interpret(expression: String)

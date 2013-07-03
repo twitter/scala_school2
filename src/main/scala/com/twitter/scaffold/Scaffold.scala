@@ -1,10 +1,16 @@
 package com.twitter.scaffold
 
-import akka.actor.{ Actor, ActorRef }
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import akka.io.IO
+import spray.can.Http
 import spray.http.StatusCodes.{ BadRequest, NoContent }
 import spray.routing.HttpService
 
-class Scaffold(val console: ActorRef) extends Actor with HttpService {
+class Scaffold extends Actor with HttpService {
+
+  // TODO #6: there should be many console actors supervised by Scaffold, one per user session
+  val console = context.actorOf(Console.props, "console")
+
   /* HttpService */
   override val actorRefFactory = context
 
@@ -49,4 +55,17 @@ class Scaffold(val console: ActorRef) extends Actor with HttpService {
       }
     }
 
+}
+
+object Scaffold extends App {
+  implicit val system = akka.actor.ActorSystem("scaffold-system")
+
+  val props = Props[Scaffold]
+  val scaffold = system.actorOf(props, "scaffold")
+
+  IO(Http) ! Http.Bind(
+    listener  = scaffold,
+    interface = "localhost",
+    port      = 8080
+  )
 }
