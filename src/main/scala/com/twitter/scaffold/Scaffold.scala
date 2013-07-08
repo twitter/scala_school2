@@ -45,7 +45,7 @@ class Scaffold extends Actor with HttpService {
     path("console") {
       post {
         complete {
-          val id = random.nextInt().abs
+          val id = random.nextLong().abs
           val console = context.actorOf(Console.props, "console-%d".format(id))
           consoles(id) = console
           id.toString
