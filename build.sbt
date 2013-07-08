@@ -18,7 +18,8 @@ libraryDependencies ++= Seq(
   "org.webjars"       %  "bootstrap"      % "2.3.2"     % "runtime",
   "org.webjars"       %  "codemirror"     % "3.14"      % "runtime",
   "org.webjars"       %  "html5shiv"      % "3.6.2"     % "runtime",
-  "org.webjars"       %  "jquery"         % "2.0.2"     % "runtime"
+  "org.webjars"       %  "jquery"         % "2.0.2"     % "runtime",
+  "org.scalatest"     %% "scalatest"      % "1.9.1"     % "test"
 )
 
 fork := true
