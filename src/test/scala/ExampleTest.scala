@@ -1,10 +1,15 @@
-import org.scalatest.FunSpec
+import org.scalatest.WordSpec
+import org.scalatest.matchers.MustMatchers
 
 class ExampleTest extends WordSpec with MustMatchers {
   
-  describe("One Test") {
-    it("should pass an assert") {
-      assert(1 === 1)
+  "Any test" must {
+    "accurately perform comparisons" in {
+      1 must equal (1)
+    }
+    
+    "accurately perform calculations" in {
+      (1 + 1) must equal (2)
     }
   }
   
