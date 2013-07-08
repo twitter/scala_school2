@@ -1,6 +1,10 @@
 import org.scalatest.WordSpec
 import org.scalatest.matchers.MustMatchers
 
+// Testing documentation
+// http://doc.scalatest.org/1.0/org/scalatest/WordSpec.html
+// http://doc.scalatest.org/1.0/org/scalatest/matchers/MustMatchers.html
+
 class ExampleTest extends WordSpec with MustMatchers {
   
   "Any test" must {
