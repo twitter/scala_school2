@@ -59,13 +59,30 @@ class Scaffold extends Actor with HttpService {
 
 object Scaffold extends App {
   implicit val system = akka.actor.ActorSystem("scaffold-system")
+  type ConfigMap = Map[Symbol, Any]
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+  val configMap = parseConfig(Map(), args.toList)
+  val host_name = configMap.getOrElse('h, "localhost").asInstanceOf[String]
+  val port_number = configMap.getOrElse('p, 8080).asInstanceOf[Int]
 
   IO(Http) ! Http.Bind(
     listener  = scaffold,
-    interface = "localhost",
-    port      = 8080
+    interface = host_name,
+    port      = port_number
   )
+
+  def parseConfig(map: ConfigMap, list: List[String]) : ConfigMap = {
+    def isSwitch(s : String) = (s(0) == '-')
+    list match {
+      case Nil => map
+      case ("-h" | "--host") :: value :: tail =>
+                             parseConfig(map ++ Map('h -> value), tail)
+      case ("-p" | "--port") :: value :: tail =>
+                             parseConfig(map ++ Map('p -> value.toInt), tail)
+      case option :: tail => println("Unknown command line parameter: " + option) 
+                             exit(1) 
+    }
+  }
 }
