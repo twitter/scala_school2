@@ -5,7 +5,8 @@ import akka.io.IO
 import scala.collection.mutable
 import scala.util.Random
 import spray.can.Http
-import spray.http.StatusCodes.{ BadRequest, NoContent, NotFound }
+import spray.http.HttpHeaders.Location
+import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
 import spray.routing.{HttpService, Route}
 
 class Scaffold extends Actor with HttpService {
@@ -51,11 +52,12 @@ class Scaffold extends Actor with HttpService {
   private[this] val consoleRoute =
     path("console") {
       post {
-        complete {
+        dynamic {
           val id = random.nextLong().abs
           val console = context.actorOf(Console.props, "console-%d".format(id))
           consoles(id) = console
-          id.toString
+          val uri = "/console/%d".format(id)
+          respondWithSingletonHeader(Location(uri)) { complete(Created) }
         }
       }
     } ~
