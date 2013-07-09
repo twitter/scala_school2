@@ -2,6 +2,7 @@ package com.twitter.scaffold
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.io.IO
+import annotation.tailrec
 import spray.can.Http
 import spray.http.StatusCodes.{ BadRequest, NoContent }
 import spray.routing.HttpService
@@ -59,35 +60,35 @@ class Scaffold extends Actor with HttpService {
 
 object Scaffold extends App {
   implicit val system = akka.actor.ActorSystem("scaffold-system")
-  type ConfigMap = Map[Symbol, Any]
+  //type ConfigMap = Map[Symbol, Any]
+  case class Config(interface: String = "localhost", port: Int = 8080)
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
 
   // Parses the command line arguments.
-  val configMap = parseConfig(Map(), args.toList)
-  val host_name = configMap.getOrElse('h, "localhost").asInstanceOf[String]
-  val port_number = configMap.getOrElse('p, 8080).asInstanceOf[Int]
-
+  val config = parseConfig(Config(), args)
+  
   IO(Http) ! Http.Bind(
     listener  = scaffold,
-    interface = host_name,
-    port      = port_number
+    interface = config.interface,
+    port      = config.port
   )
 
   /**
    * Parses the configuration from a list of input arguments.
    */
-  def parseConfig(map: ConfigMap, list: List[String]) : ConfigMap = {
-    def isSwitch(s : String) = (s(0) == '-')
-    list match {
-      case Nil => map
-      case ("-h" | "--host") :: value :: tail =>
-                             parseConfig(map ++ Map('h -> value), tail)
-      case ("-p" | "--port") :: value :: tail =>
-                             parseConfig(map ++ Map('p -> value.toInt), tail)
-      case option :: tail => println("Unknown command line parameter: " + option) 
-                             exit(1) 
+  @tailrec
+  def parseConfig(config: Config, args: Seq[String]) : Config = {
+    args match {
+      case ("-h" | "--host") +: interface +: tail =>
+        parseConfig(config.copy(interface = interface), tail)
+      case ("-p" | "--port") +: port +: tail =>
+        parseConfig(config.copy(port = port.toInt), tail)
+      case head +: tail => 
+        throw new IllegalArgumentException("Unknown parameter: %s".format(head))
+      case _ =>
+        config 
     }
   }
 }
