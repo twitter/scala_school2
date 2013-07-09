@@ -1,6 +1,7 @@
 package com.twitter.scaffold
 
 import akka.actor.{ Actor, Props }
+import scala.tools.nsc.interpreter._
 
 class Console extends Actor {
   import Console._
@@ -14,6 +15,7 @@ class Console extends Actor {
     settings.usejavacp.value = true
     settings
   })
+  val completion = new JLineCompletion(console)
 
   def receive = {
     case Interpret(expression) =>

@@ -1,6 +1,9 @@
 !function ($) {
   $(function() {
-
+	CodeMirror.commands.autocomplete = function(cm) {
+		//alert("auto-complete")
+		CodeMirror.showHint(cm, null);
+	}
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
       clearButtonTemplate = $('<button class="btn btn-mini" title="clear"><i class="icon-remove"></i></button>'),
@@ -17,7 +20,8 @@
           smartIndent: false,
           tabSize: 2,
           theme: "solarized light",
-          mode: "text/x-scala"
+          mode: "text/x-scala",
+		  extraKeys: {"Ctrl-Space": "autocomplete"}
         }),
         container = $(cm.getWrapperElement()),
         submitButton = submitButtonTemplate.clone(),
@@ -25,7 +29,8 @@
         resetButton = resetButtonTemplate.clone(),
         buttonGroup = buttonGroupTemplate.clone().append(clearButton).append(resetButton),
         output = outputTemplate.clone().append(buttonGroup),
-        submitFn = function() {
+
+        submitFn = function() {	
           $.ajax({
             type: 'POST',
             url: 'http://localhost:8080',
