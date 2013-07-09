@@ -1,8 +1,6 @@
 package com.twitter.scaffold
 
 import akka.actor.{ Actor, Props }
-import spray.json._
-import spray.json.DefaultJsonProtocol._
 
 class Console extends Actor {
   import Console._
@@ -21,13 +19,8 @@ class Console extends Actor {
 
   def receive = {
     case Complete(expression) =>
-
-      val out = new ByteArrayOutputStream
-      val result = scala.Console.withOut(out) {
-        completion.topLevelFor(Parsed.dotted(expression, 0) withVerbosity 4)
-      }
-      val jsonResp = result.toJson.toString
-      sender ! Success(jsonResp)
+      val result = completion.topLevelFor(Parsed.dotted(expression, 0) withVerbosity 4)
+      sender ! Completions(result)
     case Interpret(expression) =>
       val out = new ByteArrayOutputStream
       val result = scala.Console.withOut(out) { console.interpret(expression) }
@@ -53,5 +46,6 @@ object Console {
   // responses
   case class Success(output: String)
   case class Failure(output: String)
+  case class Completions(results: Seq[String])
 
 }
