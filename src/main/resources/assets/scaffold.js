@@ -66,7 +66,7 @@
         submitFn = function() {	
           $.ajax({
             type: 'POST',
-            url: 'http://localhost:8080',
+            url: '/',
             data: cm.getValue(),
           }).done(function (result) {
             output.removeClass('hidden').removeClass('error');
@@ -88,7 +88,7 @@
         resetButton.click(function() {
           $.ajax({
             type: 'DELETE',
-            url: 'http://localhost:8080'
+            url: '/'
           }).done(function () {
             var outputs = $('pre.output');
             outputs.addClass('hidden').removeClass('error');
