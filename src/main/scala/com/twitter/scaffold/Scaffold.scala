@@ -1,22 +1,28 @@
 package com.twitter.scaffold
 
+import annotation.tailrec
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.io.IO
+import com.twitter.spray._
 import scala.collection.mutable
 import scala.util.Random
 import spray.can.Http
-import spray.http.StatusCodes.{ BadRequest, NoContent }
-import spray.routing.HttpService
 import spray.routing.directives.CachingDirectives._
+import spray.http.HttpHeaders.Location
+import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
+import spray.httpx.SprayJsonSupport._
+import spray.httpx.TwirlSupport._
+import spray.json.DefaultJsonProtocol._
+import spray.routing.{HttpService, Route}
 
 class Scaffold extends Actor with HttpService {
-  import Scaffold.ConsoleId
+  import Scaffold.InterpreterId
 
   /* HttpService */
   override val actorRefFactory = context
 
   /* Actor */
-  override def receive = runRoute(assetsRoute ~ markdownRoute ~ consoleRoute)
+  override def receive = runRoute(assetsRoute ~ markdownRoute ~ interpreterRoute)
 
   /* Cache */
   val requestCache = routeCache()
@@ -30,10 +36,9 @@ class Scaffold extends Actor with HttpService {
       }
     }
 
-  private[this] val markdownRoute = 
+  private[this] val markdownRoute =
     get {
       cache(requestCache) {
-        import spray.httpx.TwirlSupport._
         path(Slash) {
           complete { html.index() }
         } ~
@@ -46,42 +51,57 @@ class Scaffold extends Actor with HttpService {
       }
     }
 
-  private[this] val consoles = mutable.Map.empty[ConsoleId, ActorRef]
-  private[this] val random = new Random()
+  private[this] val interpreters = mutable.Map.empty[InterpreterId, ActorRef]
 
-  private[this] val consoleRoute =
-    path("console") {
+  private def withInterpreter(id: InterpreterId)(f: ActorRef => Route): Route = {
+    interpreters.get(id) match {
+      case Some(interpreter) => f(interpreter)
+      case None => complete(NotFound)
+    }
+  }
+
+  private[this] val interpreterRoute =
+    path("autocomplete" / LongNumber) { id =>
       post {
-        complete {
-          val id = random.nextInt().abs
-          val console = context.actorOf(Console.props, "console-%d".format(id))
-          consoles(id) = console
-          id.toString
+        withInterpreter(id) { interpreter =>
+          entity(as[String]) {
+            Interpreter.Complete(_) ~> interpreter ~> {
+              case Interpreter.Completions(results) => complete { results }
+            }
+          }
         }
       }
     } ~
-    path("console" / LongNumber) { id =>
+    path("interpreter") {
       post {
-        import com.twitter.spray._
-        consoles.get(id) match {
-          case Some(console) =>
-            entity(as[String]) {
-              Console.Interpret(_) ~> console ~> {
-                case Console.Success(message) => complete { message }
-                case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
-              }
+        dynamic {
+          val id = Random.nextLong().abs
+          val interpreter = context.actorOf(Interpreter.props, "interpreter-%d".format(id))
+          interpreters(id) = interpreter
+          val uri = "/interpreter/%d".format(id)
+          respondWithSingletonHeader(Location(uri)) { complete(Created) }
+        }
+      }
+    } ~
+    path("interpreter" / LongNumber) { id =>
+      post {
+        withInterpreter(id) { interpreter =>
+          entity(as[String]) {
+            Interpreter.Interpret(_) ~> interpreter ~> {
+              case Interpreter.Success(message) => complete { message }
+              case Interpreter.Failure(message) =>
+                respondWithStatus(BadRequest) { complete { message } }
             }
-          case None => reject
+          }
         }
       } ~
       delete {
-        consoles.get(id) match {
-          case Some(console) =>
-            complete {
-              console ! Console.Reset
-              NoContent
-            }
-          case None => reject
+        withInterpreter(id) { interpreter =>
+          complete {
+            interpreter ! Interpreter.Die
+            interpreters -= id
+            NoContent
+          }
         }
       }
     }
@@ -90,14 +110,15 @@ class Scaffold extends Actor with HttpService {
 object Scaffold extends App {
   implicit val system = akka.actor.ActorSystem("scaffold-system")
 
-  type ConsoleId = Long
+  type InterpreterId = Long
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+  val flags = Flags(args)
 
   IO(Http) ! Http.Bind(
     listener  = scaffold,
-    interface = "localhost",
-    port      = 8080
+    interface = flags.interface,
+    port      = flags.port
   )
 }

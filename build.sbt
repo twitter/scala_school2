@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   "io.spray"          %  "spray-caching"  % "1.2-M8"    % "compile",
   "io.spray"          %  "spray-can"      % "1.2-M8"    % "compile",
   "io.spray"          %  "spray-httpx"    % "1.2-M8"    % "compile",
+  "io.spray"          %% "spray-json"     % "1.2.5"     % "compile",
   "io.spray"          %  "spray-routing"  % "1.2-M8"    % "compile",
   "org.pegdown"       %  "pegdown"        % "1.4.0"     % "compile",
   "org.scala-lang"    %  "scala-compiler" % "2.10.2"    % "compile",
