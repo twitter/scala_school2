@@ -9,8 +9,8 @@ import spray.routing.HttpService
 
 class Scaffold extends Actor with HttpService {
 
-  // TODO #6: there should be many console actors supervised by Scaffold, one per user session
-  val console = context.actorOf(Console.props, "console")
+  // TODO #6: there should be many interpreter actors supervised by Scaffold, one per user session
+  val interpreter = context.actorOf(Interpreter.props, "interpreter")
 
   /* HttpService */
   override val actorRefFactory = context
@@ -43,15 +43,15 @@ class Scaffold extends Actor with HttpService {
     post {
       import com.twitter.spray._
       entity(as[String]) {
-        Console.Interpret(_) ~> console ~> {
-          case Console.Success(message) => complete { message }
-          case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+        Interpreter.Interpret(_) ~> interpreter ~> {
+          case Interpreter.Success(message) => complete { message }
+          case Interpreter.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
         }
       }
     } ~
     delete {
       complete {
-        console ! Console.Reset
+        interpreter ! Interpreter.Reset
         NoContent
       }
     }
