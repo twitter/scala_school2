@@ -14,6 +14,8 @@ class Console extends Actor {
     settings.usejavacp.value = true
     settings
   })
+  // Warms up the interpreter to avoid slow first call.
+  self ! Interpret("1 + 1")
 
   def receive = {
     case Interpret(expression) =>
