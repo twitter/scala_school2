@@ -2,20 +2,21 @@ package com.twitter.scaffold
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.io.IO
+import annotation.tailrec
 import spray.can.Http
 import spray.http.StatusCodes.{ BadRequest, NoContent }
 import spray.routing.HttpService
 
 class Scaffold extends Actor with HttpService {
 
-  // TODO #6: there should be many console actors supervised by Scaffold, one per user session
-  val console = context.actorOf(Console.props, "console")
+  // TODO #6: there should be many interpreter actors supervised by Scaffold, one per user session
+  val interpreter = context.actorOf(Interpreter.props, "interpreter")
 
   /* HttpService */
   override val actorRefFactory = context
 
   /* Actor */
-  override def receive = runRoute(assetsRoute ~ markdownRoute ~ consoleRoute)
+  override def receive = runRoute(assetsRoute ~ markdownRoute ~ interpreterRoute)
 
   /* Scaffold */
   private[this] val assetsRoute =
@@ -38,19 +39,32 @@ class Scaffold extends Actor with HttpService {
       }
     }
 
-  private[this] val consoleRoute =
+  private[this] val interpreterRoute =
     post {
       import com.twitter.spray._
-      entity(as[String]) {
-        Console.Interpret(_) ~> console ~> {
-          case Console.Success(message) => complete { message }
-          case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+
+      path("autocomplete") {
+        import spray.json.DefaultJsonProtocol._
+        import spray.httpx.SprayJsonSupport._
+
+        entity(as[String]) {
+          Interpreter.Complete(_) ~> interpreter ~> {
+            case Interpreter.Completions(results) => complete { results }
+          }
+        }
+      } ~
+      path(Rest) { rest =>
+        entity(as[String]) {
+          Interpreter.Interpret(_) ~> interpreter ~> {
+            case Interpreter.Success(message) => complete { message }
+            case Interpreter.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+          }
         }
       }
     } ~
     delete {
       complete {
-        console ! Console.Reset
+        interpreter ! Interpreter.Reset
         NoContent
       }
     }
@@ -62,10 +76,11 @@ object Scaffold extends App {
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+  val flags = Flags(args)
 
   IO(Http) ! Http.Bind(
     listener  = scaffold,
-    interface = "localhost",
-    port      = 8080
+    interface = flags.interface,
+    port      = flags.port
   )
 }
