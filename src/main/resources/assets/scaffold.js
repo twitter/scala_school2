@@ -1,5 +1,6 @@
 !function ($) {	
   $(function() {
+
 	CodeMirror.commands.autocomplete = function(editor) {
 		var Pos = CodeMirror.Pos;
 		var cur = editor.getCursor(), token = editor.getTokenAt(cur), tprop = token;
@@ -32,11 +33,10 @@
 	      if (!context) var context = [];
 	      context.push(tprop);
 	    }
-		var query = token.type == "property" ? context[0].string.concat(".") : token.string;
 		$.ajax({
             type: 'POST',
             url: '/autocomplete',
-            data: query,
+            data: token.type == "property" ? context[0].string.concat(".") : token.string,
           }).done(function (result) {
 			var hints = {list: result, from: Pos(cur.line, token.start), to: Pos(cur.line, token.end)};
 			CodeMirror.showHint(editor, hints);
@@ -67,7 +67,6 @@
         resetButton = resetButtonTemplate.clone(),
         buttonGroup = buttonGroupTemplate.clone().append(clearButton).append(resetButton),
         output = outputTemplate.clone().append(buttonGroup),
-
         submitFn = function() {	
           $.ajax({
             type: 'POST',
