@@ -24,8 +24,8 @@ class Console extends Actor {
         case Results.Error | Results.Incomplete => Failure(out.toString)
       }
       sender ! response
-    case Reset =>
-      console.reset()
+    case Die =>
+      context.stop(self)
   }
 }
 
@@ -35,7 +35,7 @@ object Console {
 
   // requests
   case class Interpret(expression: String)
-  case object Reset
+  case object Die
 
   // responses
   case class Success(output: String)

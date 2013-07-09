@@ -76,7 +76,8 @@ class Scaffold extends Actor with HttpService {
       delete {
         withConsole(id) { console =>
           complete {
-            console ! Console.Reset
+            console ! Console.Die
+            consoles -= id
             NoContent
           }
         }
