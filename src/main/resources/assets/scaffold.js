@@ -1,5 +1,42 @@
 !function ($) {
   $(function() {
+    //// Session management
+
+    // Global session vars
+    var loc = 'http://localhost:8080'
+    var posturl = ""
+    var cookiename = 'location'
+
+    // Session helper functions
+    newSession = function(successCallback) {
+      var cookie = $.cookie(cookiename)
+      if (cookie === undefined) {
+        createCookie(successCallback)
+      } else {
+        posturl = cookie  // /console/id
+      }
+    }
+
+    createCookie = function(successCallback) {
+      $.ajax({
+        type: 'POST',
+        url: loc+"/console"
+      }).success(function(data, textStatus, request){
+        $.cookie(cookiename, request.getResponseHeader('location'), { expires: 7 })
+        posturl = request.getResponseHeader('location')
+        if (successCallback !== undefined) {
+          successCallback()
+        }
+      }).fail(function() {
+        console.log("Creating new cookie failed")
+      })
+    }
+
+    // Initializers
+    newSession()  // call on startup to set posturl var
+
+
+    //// Interpreter functionality
 
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
@@ -28,14 +65,31 @@
         submitFn = function() {
           $.ajax({
             type: 'POST',
-            url: 'http://localhost:8080',
+            url: posturl,
             data: cm.getValue(),
           }).done(function (result) {
             output.removeClass('hidden').removeClass('error');
             $('div.output', output).text(result);
           }).fail(function (xhr) {
-            output.removeClass('hidden').addClass('error');
-            $('div.output', output).text(xhr.responseText);
+            if (xhr.status === 404) {
+              // recreate cookie and try submission again
+              createCookie(function() {
+                $.ajax({
+                  type: 'POST',
+                  url: posturl,
+                  data: cm.getValue(),
+                }).done(function (result) {
+                  output.removeClass('hidden').removeClass('error');
+                  $('div.output', output).text(result)
+                }).fail(function (xhr){
+                  output.removeClass('hidden').addClass('error');
+                  $('div.output', output).text(xhr.responseText);
+                })
+              })
+            } else {
+              output.removeClass('hidden').addClass('error');
+              $('div.output', output).text(xhr.responseText);
+            }
           });
         };
 
@@ -50,7 +104,7 @@
         resetButton.click(function() {
           $.ajax({
             type: 'DELETE',
-            url: 'http://localhost:8080'
+            url: posturl
           }).done(function () {
             var outputs = $('pre.output');
             outputs.addClass('hidden').removeClass('error');
