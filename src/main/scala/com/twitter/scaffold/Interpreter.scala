@@ -17,7 +17,12 @@ class Interpreter extends Actor {
   // Warms up the interpreter to avoid slow first call.
   self ! Interpret("1 + 1")
 
+  private[this] val completion = new JLineCompletion(interpreter)
+
   def receive = {
+    case Complete(expression) =>
+      val result = completion.topLevelFor(Parsed.dotted(expression, 0) withVerbosity 4)
+      sender ! Completions(result)
     case Interpret(expression) =>
       val out = new ByteArrayOutputStream
       val result = Console.withOut(out) { interpreter.interpret(expression) }
@@ -26,8 +31,8 @@ class Interpreter extends Actor {
         case Results.Error | Results.Incomplete => Failure(out.toString)
       }
       sender ! response
-    case Reset =>
-      interpreter.reset()
+    case Die =>
+      context.stop(self)
   }
 }
 
@@ -37,10 +42,12 @@ object Interpreter {
 
   // requests
   case class Interpret(expression: String)
-  case object Reset
+  case class Complete(expression: String)
+  case object Die
 
   // responses
   case class Success(output: String)
   case class Failure(output: String)
+  case class Completions(results: Seq[String])
 
 }
