@@ -5,8 +5,8 @@ import akka.io.IO
 import scala.collection.mutable
 import scala.util.Random
 import spray.can.Http
-import spray.http.StatusCodes.{ BadRequest, NoContent }
-import spray.routing.HttpService
+import spray.http.StatusCodes.{ BadRequest, NoContent, NotFound }
+import spray.routing.{HttpService, Route}
 
 class Scaffold extends Actor with HttpService {
   import Scaffold.ConsoleId
@@ -41,6 +41,13 @@ class Scaffold extends Actor with HttpService {
   private[this] val consoles = mutable.Map.empty[ConsoleId, ActorRef]
   private[this] val random = new Random()
 
+  private def withConsole(id: ConsoleId)(f: ActorRef => Route): Route = {
+    consoles.get(id) match {
+      case Some(console) => f(console)
+      case None => complete(NotFound)
+    }
+  }
+
   private[this] val consoleRoute =
     path("console") {
       post {
@@ -55,25 +62,21 @@ class Scaffold extends Actor with HttpService {
     path("console" / LongNumber) { id =>
       post {
         import com.twitter.spray._
-        consoles.get(id) match {
-          case Some(console) =>
-            entity(as[String]) {
-              Console.Interpret(_) ~> console ~> {
-                case Console.Success(message) => complete { message }
-                case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
-              }
+        withConsole(id) { console =>
+          entity(as[String]) {
+            Console.Interpret(_) ~> console ~> {
+              case Console.Success(message) => complete { message }
+              case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
             }
-          case None => reject
+          }
         }
       } ~
       delete {
-        consoles.get(id) match {
-          case Some(console) =>
-            complete {
-              console ! Console.Reset
-              NoContent
-            }
-          case None => reject
+        withConsole(id) { console =>
+          complete {
+            console ! Console.Reset
+            NoContent
+          }
         }
       }
     }
