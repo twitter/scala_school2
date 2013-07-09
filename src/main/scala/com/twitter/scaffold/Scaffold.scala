@@ -7,6 +7,7 @@ import scala.util.Random
 import spray.can.Http
 import spray.http.StatusCodes.{ BadRequest, NoContent }
 import spray.routing.HttpService
+import spray.routing.directives.CachingDirectives._
 
 class Scaffold extends Actor with HttpService {
   import Scaffold.ConsoleId
@@ -17,23 +18,30 @@ class Scaffold extends Actor with HttpService {
   /* Actor */
   override def receive = runRoute(assetsRoute ~ markdownRoute ~ consoleRoute)
 
+  /* Cache */
+  val requestCache = routeCache()
+
   /* Scaffold */
   private[this] val assetsRoute =
     pathPrefix("assets") {
-      getFromResourceDirectory("META-INF/resources/webjars") ~
-      getFromResourceDirectory("assets")
+      cache(requestCache) {
+        getFromResourceDirectory("META-INF/resources/webjars") ~
+        getFromResourceDirectory("assets")
+      }
     }
 
   private[this] val markdownRoute = 
     get {
-      import spray.httpx.TwirlSupport._
-      path(Slash) {
-        complete { html.index() }
-      } ~
-      path(Rest) {
-        Document.render(_) match {
-          case Some(html) => complete { html }
-          case None => reject
+      cache(requestCache) {
+        import spray.httpx.TwirlSupport._
+        path(Slash) {
+          complete { html.index() }
+        } ~
+        path(Rest) {
+          Document.render(_) match {
+            case Some(html) => complete { html }
+            case None => reject
+          }
         }
       }
     }
