@@ -31,8 +31,8 @@ class Interpreter extends Actor {
         case Results.Error | Results.Incomplete => Failure(out.toString)
       }
       sender ! response
-    case Reset =>
-      interpreter.reset()
+    case Die =>
+      context.stop(self)
   }
 }
 
@@ -43,7 +43,7 @@ object Interpreter {
   // requests
   case class Interpret(expression: String)
   case class Complete(expression: String)
-  case object Reset
+  case object Die
 
   // responses
   case class Success(output: String)
