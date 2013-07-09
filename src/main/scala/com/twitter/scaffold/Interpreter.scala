@@ -17,7 +17,7 @@ class Interpreter extends Actor {
   // Warms up the interpreter to avoid slow first call.
   self ! Interpret("1 + 1")
 
-  private[this] val completion = new JLineCompletion(console)
+  private[this] val completion = new JLineCompletion(interpreter)
 
   def receive = {
     case Complete(expression) =>

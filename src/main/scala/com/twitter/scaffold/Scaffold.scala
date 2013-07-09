@@ -16,7 +16,7 @@ class Scaffold extends Actor with HttpService {
   override val actorRefFactory = context
 
   /* Actor */
-  override def receive = runRoute(assetsRoute ~ markdownRoute ~ consoleRoute)
+  override def receive = runRoute(assetsRoute ~ markdownRoute ~ interpreterRoute)
 
   /* Scaffold */
   private[this] val assetsRoute =
@@ -39,7 +39,7 @@ class Scaffold extends Actor with HttpService {
       }
     }
 
-  private[this] val consoleRoute =
+  private[this] val interpreterRoute =
     post {
       import com.twitter.spray._
 
@@ -48,14 +48,14 @@ class Scaffold extends Actor with HttpService {
         import spray.httpx.SprayJsonSupport._
 
         entity(as[String]) {
-          Interpreter.Complete(_) ~> console ~> {
+          Interpreter.Complete(_) ~> interpreter ~> {
             case Interpreter.Completions(results) => complete { results }
           }
         }
       } ~
       path(Rest) { rest =>
         entity(as[String]) {
-          Interpreter.Interpret(_) ~> console ~> {
+          Interpreter.Interpret(_) ~> interpreter ~> {
             case Interpreter.Success(message) => complete { message }
             case Interpreter.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
           }
