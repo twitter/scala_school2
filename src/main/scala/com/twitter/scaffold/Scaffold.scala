@@ -53,9 +53,8 @@ class Scaffold extends Actor with HttpService {
   }
 
   private[this] val interpreterRoute =
-    post {
-
-      path("autocomplete" / LongNumber) { id =>
+    path("autocomplete" / LongNumber) { id =>
+      post {
         withInterpreter(id) { interpreter =>
           entity(as[String]) {
             Interpreter.Complete(_) ~> interpreter ~> {
@@ -82,7 +81,8 @@ class Scaffold extends Actor with HttpService {
           entity(as[String]) {
             Interpreter.Interpret(_) ~> interpreter ~> {
               case Interpreter.Success(message) => complete { message }
-              case Interpreter.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+              case Interpreter.Failure(message) =>
+                respondWithStatus(BadRequest) { complete { message } }
             }
           }
         }
