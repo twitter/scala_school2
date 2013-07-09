@@ -4,6 +4,9 @@ import spray.testkit.ScalatestRouteTest
 import spray.routing.HttpService
 import spray.http.StatusCodes._
 
+// Spray test kit information
+// http://spray.io/documentation/1.1-M8/spray-testkit/
+
 class ExampleSprayTest extends WordSpec with MustMatchers with ScalatestRouteTest with HttpService {
   def actorRefFactory = system // connect the DSL to the test ActorSystem
 
