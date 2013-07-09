@@ -1,7 +1,6 @@
 package com.twitter.scaffold
 
 import akka.actor.{ Actor, Props }
-import scala.tools.nsc.interpreter._
 
 class Interpreter extends Actor {
   import Interpreter._
