@@ -1,13 +1,17 @@
 package com.twitter.scaffold
 
+import annotation.tailrec
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.io.IO
+import com.twitter.spray._
 import scala.collection.mutable
 import scala.util.Random
-import annotation.tailrec
 import spray.can.Http
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
+import spray.httpx.SprayJsonSupport._
+import spray.httpx.TwirlSupport._
+import spray.json.DefaultJsonProtocol._
 import spray.routing.{HttpService, Route}
 
 class Scaffold extends Actor with HttpService {
@@ -28,7 +32,6 @@ class Scaffold extends Actor with HttpService {
 
   private[this] val markdownRoute =
     get {
-      import spray.httpx.TwirlSupport._
       path(Slash) {
         complete { html.index() }
       } ~
@@ -51,13 +54,9 @@ class Scaffold extends Actor with HttpService {
 
   private[this] val interpreterRoute =
     post {
-      import com.twitter.spray._
 
       path("autocomplete" / LongNumber) { id =>
         withInterpreter(id) { interpreter =>
-          import spray.json.DefaultJsonProtocol._
-          import spray.httpx.SprayJsonSupport._
-
           entity(as[String]) {
             Interpreter.Complete(_) ~> interpreter ~> {
               case Interpreter.Completions(results) => complete { results }
@@ -79,7 +78,6 @@ class Scaffold extends Actor with HttpService {
     } ~
     path("interpreter" / LongNumber) { id =>
       post {
-        import com.twitter.spray._
         withInterpreter(id) { interpreter =>
           entity(as[String]) {
             Interpreter.Interpret(_) ~> interpreter ~> {
