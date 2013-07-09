@@ -42,10 +42,29 @@ class Scaffold extends Actor with HttpService {
   private[this] val consoleRoute =
     post {
       import com.twitter.spray._
-      entity(as[String]) {
-        Console.Interpret(_) ~> console ~> {
-          case Console.Success(message) => complete { message }
-          case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+      import spray.http.{ContentType, HttpEntity}
+      import spray.http.HttpCharsets._
+      import spray.http.MediaTypes._
+
+      path("autocomplete") {
+        entity(as[String]) {
+          Console.Complete(_) ~> console ~> {
+            case Console.Success(message) =>
+              val resp = HttpEntity(
+                contentType = ContentType(`application/json`, `UTF-8`),
+                string      = message
+              )
+              complete { resp }
+              // complete { HttpContent(`application/json`, """{ "key": "some value" }""")message }
+          }
+        }
+      } ~
+      path(Rest) { rest =>
+        entity(as[String]) {
+          Console.Interpret(_) ~> console ~> {
+            case Console.Success(message) => complete { message }
+            case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+          }
         }
       }
     } ~
