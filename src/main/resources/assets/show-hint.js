@@ -1,25 +1,19 @@
 (function() {
   "use strict";
 
-  CodeMirror.showHint = function(cm, options) {
+  CodeMirror.showHint = function(cm, hints) {
     // We want a single cursor position.
     if (cm.somethingSelected()) return;
     if (cm.state.completionActive) cm.state.completionActive.close();
 
-    var completion = cm.state.completionActive = new Completion(cm, options || {});
+    var completion = cm.state.completionActive = new Completion(cm);
     CodeMirror.signal(cm, "startCompletion", cm);
-    var Pos = CodeMirror.Pos;
-	var cur = cm.getCursor(), token = cm.getTokenAt(cur)
-	var myHint = {list: ["Option1", "Option2"],
-            from: Pos(cur.line, token.start),
-            to: Pos(cur.line, token.end)};
-	
-    return completion.showHints(myHint);
+    return completion.showHints(hints);
   };
 
-  function Completion(cm, getHints, options) {
+  function Completion(cm) {
     this.cm = cm;
-    this.options = options;
+    this.options = {};
     this.widget = this.onClose = null;
   }
 

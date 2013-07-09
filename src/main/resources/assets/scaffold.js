@@ -1,8 +1,12 @@
 !function ($) {
   $(function() {
 	CodeMirror.commands.autocomplete = function(cm) {
-		//alert("auto-complete")
-		CodeMirror.showHint(cm);
+		var Pos = CodeMirror.Pos;
+		var cur = cm.getCursor(), token = cm.getTokenAt(cur)
+		var hints = {list: ["Option1", "Option2"], //TODO: Post to backend and get the list.
+	            from: Pos(cur.line, token.start),
+	            to: Pos(cur.line, token.end)};
+		CodeMirror.showHint(cm, hints);
 	}
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
