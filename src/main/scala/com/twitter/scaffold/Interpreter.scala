@@ -1,7 +1,6 @@
 package com.twitter.scaffold
 
 import akka.actor.{ Actor, Props }
-import scala.tools.nsc.interpreter._
 
 class Interpreter extends Actor {
   import Interpreter._
@@ -15,9 +14,6 @@ class Interpreter extends Actor {
     settings.usejavacp.value = true
     settings
   })
-
-  val completion = new JLineCompletion(console)
-
   // Warms up the interpreter to avoid slow first call.
   self ! Interpret("1 + 1")
 

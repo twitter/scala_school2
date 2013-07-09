@@ -32,6 +32,13 @@
 	      if (!context) var context = [];
 	      context.push(tprop);
 	    }
+		$.ajax({
+            type: 'POST',
+            url: '/autocomplete',
+            data: token.string,
+          }).done(function (result) {
+            alert(result)
+          });
 		var hints = {list: ["Option1", "Option2"], //TODO: Post to backend and get the list.
 	            	from: Pos(cur.line, token.start),
 	            	to: Pos(cur.line, token.end)};
