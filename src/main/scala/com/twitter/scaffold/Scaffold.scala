@@ -10,7 +10,7 @@ import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
 import spray.routing.{HttpService, Route}
 
 class Scaffold extends Actor with HttpService {
-  import Scaffold.ConsoleId
+  import Scaffold.{ ConsoleId, random }
 
   /* HttpService */
   override val actorRefFactory = context
@@ -40,7 +40,6 @@ class Scaffold extends Actor with HttpService {
     }
 
   private[this] val consoles = mutable.Map.empty[ConsoleId, ActorRef]
-  private[this] val random = new Random()
 
   private def withConsole(id: ConsoleId)(f: ActorRef => Route): Route = {
     consoles.get(id) match {
@@ -92,6 +91,7 @@ object Scaffold extends App {
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+  val random = new Random()
 
   IO(Http) ! Http.Bind(
     listener  = scaffold,
