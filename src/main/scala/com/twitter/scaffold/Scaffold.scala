@@ -63,6 +63,8 @@ object Scaffold extends App {
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+
+  // Parses the command line arguments.
   val configMap = parseConfig(Map(), args.toList)
   val host_name = configMap.getOrElse('h, "localhost").asInstanceOf[String]
   val port_number = configMap.getOrElse('p, 8080).asInstanceOf[Int]
@@ -73,6 +75,9 @@ object Scaffold extends App {
     port      = port_number
   )
 
+  /**
+   * Parses the configuration from a list of input arguments.
+   */
   def parseConfig(map: ConfigMap, list: List[String]) : ConfigMap = {
     def isSwitch(s : String) = (s(0) == '-')
     list match {
