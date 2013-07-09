@@ -12,14 +12,14 @@
       if (cookie === undefined) {
         createCookie(successCallback)
       } else {
-        posturl = cookie  // /console/id
+        posturl = cookie  // /interpreter/id
       }
     }
 
     createCookie = function(successCallback) {
       $.ajax({
         type: 'POST',
-        url: '/console'
+        url: '/interpreter'
       }).success(function(data, textStatus, request){
         $.cookie(cookiename, request.getResponseHeader('location'), { expires: 7 })
         posturl = request.getResponseHeader('location')
