@@ -2,19 +2,23 @@ package com.twitter.scaffold
 
 import annotation.tailrec
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import akka.event.Logging._
 import akka.io.IO
 import com.twitter.spray._
 import scala.collection.mutable
 import scala.util.Random
 import spray.can.Http
 import spray.http.HttpHeaders.Location
+import spray.http.HttpRequest
 import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
 import spray.httpx.SprayJsonSupport._
 import spray.httpx.TwirlSupport._
 import spray.json.DefaultJsonProtocol._
 import spray.routing.{HttpService, Route}
+import spray.routing.directives.LogEntry
+import spray.util._
 
-class Scaffold extends Actor with HttpService {
+class Scaffold extends Actor with HttpService with SprayActorLogging {
   import Scaffold.InterpreterId
 
   /* HttpService */
@@ -25,9 +29,11 @@ class Scaffold extends Actor with HttpService {
 
   /* Scaffold */
   private[this] val assetsRoute =
-    pathPrefix("assets") {
-      getFromResourceDirectory("META-INF/resources/webjars") ~
-      getFromResourceDirectory("assets")
+    logRequest(showRequest _) {
+      pathPrefix("assets") {
+        getFromResourceDirectory("META-INF/resources/webjars") ~
+        getFromResourceDirectory("assets")
+      }
     }
 
   private[this] val markdownRoute =
@@ -97,6 +103,9 @@ class Scaffold extends Actor with HttpService {
         }
       }
     }
+
+  // Output logs
+  def showRequest(request: HttpRequest) = LogEntry((" content: " + request.entity + " url:" + request.uri).replaceAll("\n",""), InfoLevel)
 }
 
 object Scaffold extends App {
