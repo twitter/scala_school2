@@ -3,7 +3,6 @@
     //// Session management
 
     // Global session vars
-    var loc = 'http://localhost:8080'
     var posturl = ""
     var cookiename = 'location'
 
@@ -20,7 +19,7 @@
     createCookie = function(successCallback) {
       $.ajax({
         type: 'POST',
-        url: loc+"/console"
+        url: '/console'
       }).success(function(data, textStatus, request){
         $.cookie(cookiename, request.getResponseHeader('location'), { expires: 7 })
         posturl = request.getResponseHeader('location')
@@ -62,6 +61,8 @@
         resetButton = resetButtonTemplate.clone(),
         buttonGroup = buttonGroupTemplate.clone().append(clearButton).append(resetButton),
         output = outputTemplate.clone().append(buttonGroup),
+
+        // Submit code to console interpreter
         submitFn = function() {
           $.ajax({
             type: 'POST',
@@ -71,7 +72,7 @@
             output.removeClass('hidden').removeClass('error');
             $('div.output', output).text(result);
           }).fail(function (xhr) {
-            if (xhr.status === 404) {
+            if (xhr.status === 404) {  // bad cookie
               // recreate cookie and try submission again
               createCookie(function() {
                 $.ajax({
@@ -86,7 +87,7 @@
                   $('div.output', output).text(xhr.responseText);
                 })
               })
-            } else {
+            } else {  // other error
               output.removeClass('hidden').addClass('error');
               $('div.output', output).text(xhr.responseText);
             }
