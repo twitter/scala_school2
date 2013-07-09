@@ -32,17 +32,16 @@
 	      if (!context) var context = [];
 	      context.push(tprop);
 	    }
+		var query = token.type == "property" ? context[0].string.concat(".") : token.string;
 		$.ajax({
             type: 'POST',
             url: '/autocomplete',
-            data: token.string,
+            data: query,
           }).done(function (result) {
             alert(result)
+			var hints = {list: result, from: Pos(cur.line, token.start), to: Pos(cur.line, token.end)};
+			CodeMirror.showHint(editor, hints);
           });
-		var hints = {list: ["Option1", "Option2"], //TODO: Post to backend and get the list.
-	            	from: Pos(cur.line, token.start),
-	            	to: Pos(cur.line, token.end)};
-		CodeMirror.showHint(editor, hints);
 	}
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
