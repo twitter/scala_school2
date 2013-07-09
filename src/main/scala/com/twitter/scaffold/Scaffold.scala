@@ -60,7 +60,6 @@ class Scaffold extends Actor with HttpService {
 
 object Scaffold extends App {
   implicit val system = akka.actor.ActorSystem("scaffold-system")
-  //type ConfigMap = Map[Symbol, Any]
   case class Config(interface: String = "localhost", port: Int = 8080)
 
   val props = Props[Scaffold]
