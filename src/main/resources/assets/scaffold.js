@@ -38,7 +38,6 @@
             url: '/autocomplete',
             data: query,
           }).done(function (result) {
-            alert(result)
 			var hints = {list: result, from: Pos(cur.line, token.start), to: Pos(cur.line, token.end)};
 			CodeMirror.showHint(editor, hints);
           });
