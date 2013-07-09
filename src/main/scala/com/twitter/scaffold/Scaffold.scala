@@ -1,13 +1,17 @@
 package com.twitter.scaffold
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import akka.event.Logging._
 import akka.io.IO
 import annotation.tailrec
 import spray.can.Http
+import spray.http.HttpRequest
 import spray.http.StatusCodes.{ BadRequest, NoContent }
 import spray.routing.HttpService
+import spray.routing.directives.LogEntry
+import spray.util._
 
-class Scaffold extends Actor with HttpService {
+class Scaffold extends Actor with HttpService with SprayActorLogging {
 
   // TODO #6: there should be many interpreter actors supervised by Scaffold, one per user session
   val interpreter = context.actorOf(Interpreter.props, "interpreter")
@@ -20,9 +24,11 @@ class Scaffold extends Actor with HttpService {
 
   /* Scaffold */
   private[this] val assetsRoute =
-    pathPrefix("assets") {
-      getFromResourceDirectory("META-INF/resources/webjars") ~
-      getFromResourceDirectory("assets")
+    logRequest(showRequest _) {
+      pathPrefix("assets") {
+        getFromResourceDirectory("META-INF/resources/webjars") ~
+        getFromResourceDirectory("assets")
+      }
     }
 
   private[this] val markdownRoute = 
@@ -56,6 +62,8 @@ class Scaffold extends Actor with HttpService {
       }
     }
 
+  // Output logs
+  def showRequest(request: HttpRequest) = LogEntry((" content: " + request.entity + " url:" + request.uri).replaceAll("\n",""), InfoLevel)
 }
 
 object Scaffold extends App {
