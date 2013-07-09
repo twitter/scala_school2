@@ -9,8 +9,8 @@ import spray.routing.HttpService
 
 class Scaffold extends Actor with HttpService {
 
-  // TODO #6: there should be many console actors supervised by Scaffold, one per user session
-  val console = context.actorOf(Console.props, "console")
+  // TODO #6: there should be many interpreter actors supervised by Scaffold, one per user session
+  val interpreter = context.actorOf(Interpreter.props, "interpreter")
 
   /* HttpService */
   override val actorRefFactory = context
@@ -43,15 +43,15 @@ class Scaffold extends Actor with HttpService {
     post {
       import com.twitter.spray._
       entity(as[String]) {
-        Console.Interpret(_) ~> console ~> {
-          case Console.Success(message) => complete { message }
-          case Console.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
+        Interpreter.Interpret(_) ~> interpreter ~> {
+          case Interpreter.Success(message) => complete { message }
+          case Interpreter.Failure(message) => respondWithStatus(BadRequest) { complete { message } }
         }
       }
     } ~
     delete {
       complete {
-        console ! Console.Reset
+        interpreter ! Interpreter.Reset
         NoContent
       }
     }
@@ -60,34 +60,14 @@ class Scaffold extends Actor with HttpService {
 
 object Scaffold extends App {
   implicit val system = akka.actor.ActorSystem("scaffold-system")
-  case class Config(interface: String = "localhost", port: Int = 8080)
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
+  val flags = Flags(args)
 
-  // Parses the command line arguments.
-  val config = parseConfig(Config(), args)
-  
   IO(Http) ! Http.Bind(
     listener  = scaffold,
-    interface = config.interface,
-    port      = config.port
+    interface = flags.interface,
+    port      = flags.port
   )
-
-  /**
-   * Parses the configuration from a list of input arguments.
-   */
-  @tailrec
-  def parseConfig(config: Config, args: Seq[String]) : Config = {
-    args match {
-      case ("-h" | "--host") +: interface +: tail =>
-        parseConfig(config.copy(interface = interface), tail)
-      case ("-p" | "--port") +: port +: tail =>
-        parseConfig(config.copy(port = port.toInt), tail)
-      case head +: tail => 
-        throw new IllegalArgumentException("Unknown parameter: %s".format(head))
-      case _ =>
-        config 
-    }
-  }
 }
