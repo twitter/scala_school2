@@ -1,12 +1,12 @@
 (function() {
   "use strict";
 
-  CodeMirror.showHint = function(cm, getHints, options) {
+  CodeMirror.showHint = function(cm, options) {
     // We want a single cursor position.
     if (cm.somethingSelected()) return;
     if (cm.state.completionActive) cm.state.completionActive.close();
 
-    var completion = cm.state.completionActive = new Completion(cm, null, options || {});
+    var completion = cm.state.completionActive = new Completion(cm, options || {});
     CodeMirror.signal(cm, "startCompletion", cm);
     var Pos = CodeMirror.Pos;
 	var cur = cm.getCursor(), token = cm.getTokenAt(cur)
@@ -19,7 +19,6 @@
 
   function Completion(cm, getHints, options) {
     this.cm = cm;
-    this.getHints = getHints;
     this.options = options;
     this.widget = this.onClose = null;
   }
@@ -58,7 +57,7 @@
       this.widget = new Widget(this, data);
       CodeMirror.signal(data, "shown");
 
-      var debounce = null, completion = this, finished;
+      var completion = this, finished;
       var closeOn = this.options.closeCharacters || /[\s()\[\]{};:>,]/;
       var startPos = this.cm.getCursor(), startLen = this.cm.getLine(startPos.line).length;
 
@@ -73,30 +72,12 @@
         if (finished) return true;
         if (!completion.widget) { done(); return true; }
       }
-
-      function update() {
-        if (isDone()) return;
-        if (completion.options.async)
-          completion.getHints(completion.cm, finishUpdate, completion.options);
-        else
-          finishUpdate(completion.getHints(completion.cm, completion.options));
-      }
-      function finishUpdate(data) {
-        if (isDone()) return;
-        if (!data || !data.list.length) return done();
-        completion.widget.close();
-        completion.widget = new Widget(completion, data);
-      }
-
       function activity() {
-        clearTimeout(debounce);
         var pos = completion.cm.getCursor(), line = completion.cm.getLine(pos.line);
         if (pos.line != startPos.line || line.length - pos.ch != startLen - startPos.ch ||
             pos.ch < startPos.ch || completion.cm.somethingSelected() ||
             (pos.ch && closeOn.test(line.charAt(pos.ch - 1))))
           completion.close();
-        else
-          debounce = setTimeout(update, 170);
       }
       this.cm.on("cursorActivity", activity);
       this.onClose = done;

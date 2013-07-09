@@ -2,7 +2,7 @@
   $(function() {
 	CodeMirror.commands.autocomplete = function(cm) {
 		//alert("auto-complete")
-		CodeMirror.showHint(cm, null);
+		CodeMirror.showHint(cm);
 	}
     var
       submitButtonTemplate = $('<button class="btn btn-small btn-primary">submit</button>'),
