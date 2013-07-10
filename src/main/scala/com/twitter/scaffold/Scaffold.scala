@@ -15,19 +15,17 @@ import spray.routing._
 import spray.routing.directives._
 import spray.util._
 
-class Scaffold extends Actor with HttpService with CachingDirectives with SprayActorLogging {
+trait ScaffoldService extends HttpService with CachingDirectives {
+  private[this] def requestCache = routeCache()
+  private[this] val interpreters = collection.mutable.Map.empty[Long, ActorRef]
+  private[this] def withInterpreter(id: Long)(f: ActorRef => Route): Route = {
+    interpreters.get(id) match {
+      case Some(interpreter) => f(interpreter)
+      case None => complete(NotFound)
+    }
+  }
 
-  /* HttpService */
-  override val actorRefFactory = context
-
-  /* Actor */
-  override def receive = runRoute(logRequestResponse("scaffold", InfoLevel) { assetsRoute ~ markdownRoute ~ interpreterRoute })
-
-  /* Cache */
-  val requestCache = routeCache()
-
-  /* Scaffold */
-  private[this] val assetsRoute =
+  def assetsRoute =
     pathPrefix("assets") {
       cache(requestCache) {
         getFromResourceDirectory("META-INF/resources/webjars") ~
@@ -35,7 +33,7 @@ class Scaffold extends Actor with HttpService with CachingDirectives with SprayA
       }
     }
 
-  private[this] val markdownRoute =
+  def markdownRoute =
     get {
       cache(requestCache) {
         path(Slash) {
@@ -50,21 +48,12 @@ class Scaffold extends Actor with HttpService with CachingDirectives with SprayA
       }
     }
 
-  private[this] val interpreters = collection.mutable.Map.empty[Long, ActorRef]
-
-  private def withInterpreter(id: Long)(f: ActorRef => Route): Route = {
-    interpreters.get(id) match {
-      case Some(interpreter) => f(interpreter)
-      case None => complete(NotFound)
-    }
-  }
-
-  private[this] val interpreterRoute =
+  def interpreterRoute =
     path("interpreter") {
       post {
         dynamic {
           val id = util.Random.nextLong().abs
-          val interpreter = context.actorOf(Interpreter.props, "interpreter-%d".format(id))
+          val interpreter = actorRefFactory.actorOf(Interpreter.props, "interpreter-%d".format(id))
           interpreters(id) = interpreter
           val uri = "/interpreter/%d".format(id)
           respondWithSingletonHeader(Location(uri)) { complete(Created) }
@@ -75,7 +64,7 @@ class Scaffold extends Actor with HttpService with CachingDirectives with SprayA
       post {
         entity(as[String]) { expression =>
           withInterpreter(id) { interpreter =>
-            Interpreter.Interpret(expression) ~> interpreter ~> {
+            Interpreter.Interpret(expression) -!> interpreter -!> {
               case Interpreter.Success(message) =>
                 complete { message }
               case Interpreter.Failure(message) =>
@@ -98,7 +87,7 @@ class Scaffold extends Actor with HttpService with CachingDirectives with SprayA
       post {
         entity(as[String]) { expression =>
           withInterpreter(id) { interpreter =>
-            Interpreter.Complete(expression) ~> interpreter ~> {
+            Interpreter.Complete(expression) -!> interpreter -!> {
               case Interpreter.Completions(results) => complete { results }
             }
           }
@@ -106,14 +95,27 @@ class Scaffold extends Actor with HttpService with CachingDirectives with SprayA
       }
     }
 
+  def route = assetsRoute ~ markdownRoute ~ interpreterRoute
+}
+
+class Scaffold extends Actor with ScaffoldService {
+  override val actorRefFactory = context
+  override def receive = runRoute(logRequestResponse("scaffold", InfoLevel) { route })
 }
 
 object Scaffold extends App {
-  implicit val system = akka.actor.ActorSystem("scaffold-system")
+  implicit val system = ActorSystem("scaffold-system")
 
   val props = Props[Scaffold]
   val scaffold = system.actorOf(props, "scaffold")
   val flags = Flags(args)
+
+  {
+    // pre-warm the interpreter
+    val warm = system.actorOf(Interpreter.props)
+    warm ! Interpreter.Interpret("1 + 1")
+    warm ! PoisonPill
+  }
 
   IO(Http) ! Http.Bind(
     listener  = scaffold,
