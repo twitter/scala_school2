@@ -12,17 +12,20 @@ object Document {
   def renderText(nodes: Node*): String = (new markdown.TextRenderer).toText(nodes)
   def renderHref(nodes: Node*): String = renderText(nodes: _*).replaceAll("\\W+", "-").toLowerCase
 
-  def render(name: String): Option[Html] = for {
-    text     <- load(name)
-    document <- parse(text)
-  } yield html.markdown(document)
+  def render(name: String): Option[Html] = {
+    for {
+      text     <- load(name)
+      document <- parse(text)
+    } yield html.markdown(document)
+  }
 
   private[this] val / = sys.props("file.separator")
-  private def load(name: String): Option[Array[Char]] =
+  private def load(name: String): Option[Array[Char]] = {
     getClass.getResourceAsStream(/ + "markdown" + / + name + ".md") match {
       case null   => None
       case stream => Some(io.Source.fromInputStream(stream).toArray)
     }
+  }
 
   private def parse(text: Array[Char]): Option[Document] = {
     import collection.JavaConverters.asScalaBufferConverter
