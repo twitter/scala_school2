@@ -7,6 +7,7 @@ import com.twitter.spray._
 import scala.collection.mutable
 import scala.util.Random
 import spray.can.Http
+import spray.routing.directives.CachingDirectives._
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes.{ BadRequest, Created, NoContent, NotFound }
 import spray.httpx.SprayJsonSupport._
@@ -23,22 +24,29 @@ class Scaffold extends Actor with HttpService {
   /* Actor */
   override def receive = runRoute(assetsRoute ~ markdownRoute ~ interpreterRoute)
 
+  /* Cache */
+  val requestCache = routeCache()
+
   /* Scaffold */
   private[this] val assetsRoute =
     pathPrefix("assets") {
-      getFromResourceDirectory("META-INF/resources/webjars") ~
-      getFromResourceDirectory("assets")
+      cache(requestCache) {
+        getFromResourceDirectory("META-INF/resources/webjars") ~
+        getFromResourceDirectory("assets")
+      }
     }
 
   private[this] val markdownRoute =
     get {
-      path(Slash) {
-        complete { html.index() }
-      } ~
-      path(Rest) {
-        Document.render(_) match {
-          case Some(html) => complete { html }
-          case None => reject
+      cache(requestCache) {
+        path(Slash) {
+          complete { html.index() }
+        } ~
+        path(Rest) {
+          Document.render(_) match {
+            case Some(html) => complete { html }
+            case None => reject
+          }
         }
       }
     }
