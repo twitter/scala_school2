@@ -8,6 +8,31 @@
     outputTemplate = $('<pre class="output hidden"><div class="output"></div></pre>'),
     interpreterCookie = 'scaffold-interpreter';
 
+	function autoComplete(editor) {
+		var Pos = CodeMirror.Pos, cur = editor.getCursor(), cur_token = editor.getTokenAt(cur);
+		var tokens = editor.getLine(cur.line).split(/[\ \,\;\(\)\{\}]/);
+		var token = tokens[tokens.length - 1];
+		if (cur_token.string == ".") cur_token.start++;
+		withInterpreter(function(interpreter) {
+	      $.ajax({
+	        type: 'POST',
+	        url: interpreter + "/completions",
+	        data: token,
+	      }).done(function (result) {
+			var hints = {list: result, from: Pos(cur.line, cur_token.start), to: Pos(cur.line, cur_token.end)};
+			CodeMirror.showHint(editor, hints);
+	      }).fail(function (xhr) {
+	        if (xhr.status === 404) {
+	        	withNewInterpreter(function (interpreter) {
+	              autoComplete(editor);
+	            });
+	        } else {
+	          console.log("Unexpected failure")
+	        }
+	      });
+	    });
+	}
+
   function withInterpreter(fn) {
     var interpreter = $.cookie(interpreterCookie);
     if (interpreter === undefined) {
@@ -74,6 +99,7 @@
   }
 
   $(function() {
+	CodeMirror.commands.autocomplete = autoComplete
     $('textarea').each(function (_, e) {
       var
         cm = CodeMirror.fromTextArea(e, {
@@ -83,7 +109,8 @@
           smartIndent: false,
           tabSize: 2,
           theme: "solarized light",
-          mode: "text/x-scala"
+          mode: "text/x-scala",
+		  extraKeys: {"Ctrl-Space": "autocomplete"}
         }),
         container = $(cm.getWrapperElement()),
         submitButton = submitButtonTemplate.clone(),
