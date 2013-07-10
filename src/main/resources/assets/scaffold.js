@@ -2,43 +2,16 @@
   $(function() {
 
 	CodeMirror.commands.autocomplete = function(editor) {
-		var Pos = CodeMirror.Pos;
-		var cur = editor.getCursor(), token = editor.getTokenAt(cur), tprop = token;
-	    token.state = CodeMirror.innerMode(editor.getMode(), token.state).state;
-	    // If it's not a 'word-style' token, ignore the token.
-	    if (!/^[\w$_]*$/.test(token.string)) {
-	      token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
-	                       type: token.string == "." ? "property" : null};
-	    }
-	    // If it is a property, find out what it is a property of.
-	    while (tprop.type == "property") {
-	      tprop = editor.getTokenAt(Pos(cur.line, tprop.start));
-	      if (tprop.string != ".") return;
-	      tprop = editor.getTokenAt(Pos(cur.line, tprop.start));
-	      if (tprop.string == ')') {
-	        var level = 1;
-	        do {
-	          tprop = editor.getTokenAt(Pos(cur.line, tprop.start));
-	          switch (tprop.string) {
-	          case ')': level++; break;
-	          case '(': level--; break;
-	          default: break;
-	          }
-	        } while (level > 0);
-	        tprop = editor.getTokenAt(Pos(cur.line, tprop.start));
-	        if (tprop.type.indexOf("variable") === 0)
-	          tprop.type = "function";
-	        else return; // no clue
-	      }
-	      if (!context) var context = [];
-	      context.push(tprop);
-	    }
+		var Pos = CodeMirror.Pos, cur = editor.getCursor(), cur_token = editor.getTokenAt(cur);
+		var tokens = editor.getLine(cur.line).split(/[\ \,\;\(\)\{\}]/)
+		var token = tokens[tokens.length - 1]
+		if (cur_token.string == ".") cur_token.start++;
 		$.ajax({
             type: 'POST',
             url: '/autocomplete',
-            data: token.type == "property" ? context[0].string.concat(".") : token.string,
+            data: token,
           }).done(function (result) {
-			var hints = {list: result, from: Pos(cur.line, token.start), to: Pos(cur.line, token.end)};
+			var hints = {list: result, from: Pos(cur.line, cur_token.start), to: Pos(cur.line, cur_token.end)};
 			CodeMirror.showHint(editor, hints);
           });
 	}
