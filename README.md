@@ -8,7 +8,16 @@ The goal of Scala School 2 is to provide organized, interactive, reference-quali
 
 We aim to eventually provide this as a high availability public service, hosted by Twitter, for people everywhere to learn Scala. Currently, however, this is a *very bad idea* for technical reasons: the underlying Scala interpreter is not sandboxed (see issues [#6](https://github.com/twitter/scala_school2/issues/6) and [#7](https://github.com/twitter/scala_school2/issues/7)). So, for now, please download the project and run it locally.
 
+## Dependencies
+
+Scala School 2's interpreter relies on a non-maven published project called levee to do sandboxing. The tl;dr is do:
+
+`git clone https://github.com/mergeconflict/levee`
+
+Then cd to wherever you cloned it and do `mvn install`.
+
 ## Running
+
 
 `sbt run` will start an HTTP server on port 8080.
 
