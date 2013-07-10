@@ -1,2 +1,1 @@
-web: target/start
-
+web: target/start --port $PORT
