@@ -25,15 +25,13 @@ class Scaffold extends Actor with HttpService with SprayActorLogging {
   override val actorRefFactory = context
 
   /* Actor */
-  override def receive = runRoute(assetsRoute ~ markdownRoute ~ interpreterRoute)
+  override def receive = runRoute(logRequest(showRequest _) { assetsRoute ~ markdownRoute ~ interpreterRoute } )
 
   /* Scaffold */
   private[this] val assetsRoute =
-    logRequest(showRequest _) {
-      pathPrefix("assets") {
-        getFromResourceDirectory("META-INF/resources/webjars") ~
-        getFromResourceDirectory("assets")
-      }
+    pathPrefix("assets") {
+      getFromResourceDirectory("META-INF/resources/webjars") ~
+      getFromResourceDirectory("assets")
     }
 
   private[this] val markdownRoute =
@@ -105,7 +103,8 @@ class Scaffold extends Actor with HttpService with SprayActorLogging {
     }
 
   // Output logs
-  def showRequest(request: HttpRequest) = LogEntry((" content: " + request.entity + " url:" + request.uri).replaceAll("\n",""), InfoLevel)
+  def showRequest(request: HttpRequest) = LogEntry(
+    "content: %s url: %s".format(request.entity, request.uri).replaceAll("\n", ""), InfoLevel)
 }
 
 object Scaffold extends App {
