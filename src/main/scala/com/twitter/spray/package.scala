@@ -2,7 +2,7 @@ package com.twitter
 
 package object spray {
 
-  import akka.actor.{ Actor, ActorContext, ActorRef, Props }
+  import akka.actor.{ Actor, ActorRef, ActorRefFactory, Props }
   import _root_.spray.routing.{ RequestContext, Route }
 
   class Continuation(run: PartialFunction[Any, Route], ctx: RequestContext) extends Actor {
@@ -18,15 +18,15 @@ package object spray {
       Props(classOf[Continuation], run, ctx)
   }
 
-  class AndThen(message: Any, ref: ActorRef, factory: ActorContext) {
-    def ~>(run: PartialFunction[Any, Route])(ctx: RequestContext): Unit = {
+  class AndThen(message: Any, ref: ActorRef, factory: ActorRefFactory) {
+    def -!>(run: PartialFunction[Any, Route])(ctx: RequestContext): Unit = {
       val continuation = factory actorOf Continuation.props(run, ctx)
       ref.tell(message, continuation)
     }
   }
 
-  implicit class MessageOps(message: Any)(implicit factory: ActorContext) {
-    def ~>(ref: ActorRef): AndThen = new AndThen(message, ref, factory)
+  implicit class MessageOps(message: Any)(implicit factory: ActorRefFactory) {
+    def -!>(ref: ActorRef): AndThen = new AndThen(message, ref, factory)
   }
 
 }
