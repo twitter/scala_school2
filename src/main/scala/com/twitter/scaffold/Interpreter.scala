@@ -19,7 +19,7 @@ class Interpreter extends Actor {
 
   def receive = {
     case Complete(expression) =>
-      val result = completion.topLevelFor(Parsed.dotted(expression, 0) withVerbosity 4)
+      val result = completion.topLevelFor(Parsed.dotted(expression, expression.length) withVerbosity 4)
       sender ! Completions(result)
     case Interpret(expression) =>
       val out = new ByteArrayOutputStream

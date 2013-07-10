@@ -1,18 +1,21 @@
 package com.twitter.scaffold
 
 import akka.actor._
+import akka.event.Logging.InfoLevel
 import akka.io.IO
 import com.twitter.spray._
 import spray.can.Http
-import spray.routing.directives.CachingDirectives._
+import spray.http._
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
 import spray.httpx.TwirlSupport._
 import spray.json.DefaultJsonProtocol._
 import spray.routing._
+import spray.routing.directives._
+import spray.util._
 
-trait ScaffoldService extends HttpService {
+trait ScaffoldService extends HttpService with CachingDirectives {
   private[this] def requestCache = routeCache()
   private[this] val interpreters = collection.mutable.Map.empty[Long, ActorRef]
   private[this] def withInterpreter(id: Long)(f: ActorRef => Route): Route = {
@@ -97,7 +100,7 @@ trait ScaffoldService extends HttpService {
 
 class Scaffold extends Actor with ScaffoldService {
   override val actorRefFactory = context
-  override def receive = runRoute(route)
+  override def receive = runRoute(logRequestResponse("scaffold", InfoLevel) { route })
 }
 
 object Scaffold extends App {
