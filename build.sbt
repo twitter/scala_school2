@@ -29,4 +29,6 @@ seq(Revolver.settings: _*)
 
 seq(Twirl.settings: _*)
 
+seq(com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings: _*)
+
 Twirl.twirlImports := Seq("com.twitter.scaffold.Document", "Document._")
