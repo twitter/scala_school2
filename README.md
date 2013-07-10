@@ -18,7 +18,6 @@ Then cd to wherever you cloned it and do `mvn install`.
 
 ## Running
 
-
 `sbt run` will start an HTTP server on port 8080.
 
 ## License

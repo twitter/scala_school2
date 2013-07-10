@@ -6,7 +6,7 @@ version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.10.2"
 
-resolvers += "spray repo" at "http://repo.spray.io" 
+resolvers += "spray repo" at "http://repo.spray.io"
 
 resolvers += "Local Maven repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
 
