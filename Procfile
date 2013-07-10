@@ -1,0 +1,2 @@
+web: target/start
+
