@@ -19,13 +19,18 @@ class ContentSpec extends WordSpec with MustMatchers {
 
   private[this] val / = sys.props("file.separator")
   private[this] val markdownDirectory = / + "markdown" + /
-  "All content" must {
-    "have a directory available" in {
-      getClass().getResource(/ + "markdown" + /) must not be (null)
+  "A resource directory" must {
+    "exist" in {
+      getClass().getResource(markdownDirectory) must not be (null)
     }
 
-    "be parsable by the markdown parser" in {
-      val mainFile = new File(getClass().getResource(/ + "markdown" + /).getPath())
+    "not be empty" in {
+      val mainFile = new File(getClass().getResource(markdownDirectory).getPath())
+      allFilesInDirectory(mainFile).filter {_.getName.endsWith(".md")} must not have length (0)
+    }
+
+    "have valid markdown resources" in {
+      val mainFile = new File(getClass().getResource(markdownDirectory).getPath())
       allFilesInDirectory(mainFile).collect {
         case file if file.getName.endsWith(".md") => 
           val fileName = file.getPath().drop(getClass().getResource(/ + "markdown" + /).getPath().length).dropRight(3)
