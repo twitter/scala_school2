@@ -6,8 +6,6 @@ object Flags {
   def apply(args: Seq[String]): Flags = {
     @annotation.tailrec
     def go(flags: Flags, args: Seq[String]): Flags = args match {
-      case ("-i" | "--interface") +: interface +: tail =>
-        go(flags.copy(interface = interface), tail)
       case ("-p" | "--port") +: port +: tail =>
         go(flags.copy(port = port.toInt), tail)
       case unknown +: tail =>

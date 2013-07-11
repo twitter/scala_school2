@@ -20,7 +20,10 @@ libraryDependencies ++= Seq(
   "org.webjars"       %  "bootstrap"      % "2.3.2"     % "runtime",
   "org.webjars"       %  "codemirror"     % "3.14"      % "runtime",
   "org.webjars"       %  "html5shiv"      % "3.6.2"     % "runtime",
-  "org.webjars"       %  "jquery"         % "2.0.2"     % "runtime"
+  "org.webjars"       %  "jquery"         % "2.0.2"     % "runtime",
+  "com.typesafe.akka" %% "akka-testkit"   % "2.2.0-RC1" % "test",
+  "io.spray"          %  "spray-testkit"  % "1.2-M8"    % "test",
+  "org.scalatest"     %% "scalatest"      % "1.9.1"     % "test"
 )
 
 fork := true
@@ -28,5 +31,7 @@ fork := true
 seq(Revolver.settings: _*)
 
 seq(Twirl.settings: _*)
+
+seq(com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings: _*)
 
 Twirl.twirlImports := Seq("com.twitter.scaffold.Document", "Document._")
