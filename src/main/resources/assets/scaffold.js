@@ -10,7 +10,7 @@
 
 	function autoComplete(editor) {
 		var Pos = CodeMirror.Pos, cur = editor.getCursor(), cur_token = editor.getTokenAt(cur);
-		var tokens = editor.getLine(cur.line).split(/[\ \,\;\(\)\{\}]/);
+		var tokens = editor.getLine(cur.line).split(/[^a-zA-Z0-9._]/);
 		var token = tokens[tokens.length - 1];
 		if (cur_token.string == ".") cur_token.start++;
 		withInterpreter(function(interpreter) {
