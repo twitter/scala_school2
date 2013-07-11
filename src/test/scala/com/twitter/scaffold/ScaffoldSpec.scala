@@ -1,11 +1,12 @@
 package com.twitter.scaffold
 
+import concurrent.duration._
 import org.scalatest.OptionValues._
 import org.scalatest.WordSpec
 import org.scalatest.matchers.MustMatchers
 import spray.testkit.ScalatestRouteTest
 import spray.http.StatusCodes._
-import concurrent.duration._
+
 
 
 class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest with ScaffoldService {
@@ -15,7 +16,7 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
 
   "The asset route" should {
     "respond to GET /" in {
-      Get("/") ~> route ~> check {
+      Get("/") ~> sealRoute(assetsRoute) ~> check {
         entityAs[String] must not have length (0)
       }
     }
@@ -26,25 +27,25 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
   "The interpreter route" which afterWord("has") {
     "not been created" must {
       "not respond to GET requests" in {
-        Get("/interpreter") ~> sealRoute(route) ~> check {
-          status must be (NotFound)
+        Get("/interpreter") ~> sealRoute(interpreterRoute) ~> check {
+          status must be (MethodNotAllowed)
         }
       }
 
       "not interpret code to fake interpreter" in {
-        Post("/interpreter/0","1 + 1") ~> route ~> check {
+        Post("/interpreter/0","1 + 1") ~> sealRoute(interpreterRoute) ~> check {
           status must be (NotFound)
         }
       }
 
       "not delete invalid consoles" in {
-        Delete("/interpreter/0","1 + 1") ~> route ~> check {
+        Delete("/interpreter/0","1 + 1") ~> sealRoute(interpreterRoute) ~> check {
           status must be (NotFound)
         }
       }
 
       "be able to create a new console" in {
-        Post("/interpreter","") ~> route ~> check {
+        Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
           status must be (Created)
           header("Location") must be ('defined)
           // Get the Option value and then get the HttpHeader Value
@@ -55,7 +56,7 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
 
     "been created" must {
       "interpret code" in {
-        Post("/interpreter","") ~> route ~> check {
+        Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
           val newInterpreterLocation = header("Location").value.value
           Post(newInterpreterLocation, "1 + 1") ~> route ~> check {
             status must be (OK)
@@ -64,12 +65,12 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
       }
 
       "not share namespace with other console" in {
-        Post("/interpreter","") ~> route ~> check {
+        Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
           val newInterpreterLocation = header("Location").value.value
           Post(newInterpreterLocation, "def myThingA = 1 + 1") ~> route ~> check {
             status must be (OK)
 
-            Post("/interpreter","") ~> route ~> check {
+            Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
               val secondInterpreterLocation = header("Location").value.value
               Post(secondInterpreterLocation, "myThingA") ~> route ~> check {
                 status must be (BadRequest)
@@ -82,7 +83,7 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
 
     "been deleted" must {
       "not interpret code" in {
-        Post("/interpreter","") ~> route ~> check {
+        Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
           val newInterpreterLocation = header("Location").value.value
           Delete(newInterpreterLocation) ~> route ~> check {
             status must be (NoContent)
