@@ -117,9 +117,11 @@ object Scaffold extends App {
     warm ! PoisonPill
   }
 
-  IO(Http) ! Http.Bind(
+  IO(Http) ! new Http.Bind(
     listener  = scaffold,
-    interface = flags.interface,
-    port      = flags.port
+    endpoint  = new java.net.InetSocketAddress(flags.port),
+    backlog   = 100,
+    options   = Nil,
+    settings  = None
   )
 }
