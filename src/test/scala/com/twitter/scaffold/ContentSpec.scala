@@ -3,7 +3,6 @@ package io.utils
 import java.io.File
 import org.scalatest.WordSpec
 import org.scalatest.matchers.MustMatchers
-import org.pegdown._
 import com.twitter.scaffold.Document
 
 // Testing documentation
@@ -12,31 +11,30 @@ import com.twitter.scaffold.Document
 
 class ContentSpec extends WordSpec with MustMatchers {
   
-  def allFilesInDirectory(path: File): List[File] = path.listFiles.toList.flatMap {file =>
+  def allFilesInDirectory(path: File): Seq[File] = path.listFiles() flatMap { file =>
     if (file.isDirectory) allFilesInDirectory(file)
-    else List(file)
+    else Seq(file)
   }
 
-  private[this] val / = sys.props("file.separator")
-  private[this] val markdownDirectory = / + "markdown" + /
+  private[this] val markdownDirectory = "/markdown"
+  private[this] val markdownRoute = getClass().getResource(markdownDirectory)
   "A resource directory" must {
     "exist" in {
-      getClass().getResource(markdownDirectory) must not be (null)
+      markdownRoute must not be (null)
     }
 
     "not be empty" in {
-      val mainFile = new File(getClass().getResource(markdownDirectory).getPath())
-      allFilesInDirectory(mainFile).filter {_.getName.endsWith(".md")} must not have length (0)
+      val mainFile = new File(markdownRoute.getPath())
+      allFilesInDirectory(mainFile) filter {_.getName.endsWith(".md")} must not have length (0)
     }
 
     "have valid markdown resources" in {
       val mainFile = new File(getClass().getResource(markdownDirectory).getPath())
-      allFilesInDirectory(mainFile).collect {
+      allFilesInDirectory(mainFile) collect {
         case file if file.getName.endsWith(".md") => 
           val fileName = file.getPath().drop(getClass().getResource(/ + "markdown" + /).getPath().length).dropRight(3)
           Document.render(fileName)
       }
     }
-  }
-  
+  }  
 }
