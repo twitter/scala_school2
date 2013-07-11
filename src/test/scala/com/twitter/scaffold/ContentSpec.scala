@@ -17,10 +17,6 @@ class ContentSpec extends WordSpec with MustMatchers {
     else List(file)
   }
 
-  /*def allFilesInDirectories(directories: List[File]) = directories flatMap {
-    oneFile => oneFile.listFiles.filter { !_.isDirectory }
-  }*/
-
   private[this] val / = sys.props("file.separator")
   private[this] val markdownDirectory = / + "markdown" + /
   "All content" must {
