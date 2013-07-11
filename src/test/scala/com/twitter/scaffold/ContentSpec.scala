@@ -29,10 +29,10 @@ class ContentSpec extends WordSpec with MustMatchers {
     }
 
     "have valid markdown resources" in {
-      val mainFile = new File(getClass().getResource(markdownDirectory).getPath())
+      val mainFile = new File(markdownRoute.getPath())
       allFilesInDirectory(mainFile) collect {
         case file if file.getName.endsWith(".md") => 
-          val fileName = file.getPath().drop(getClass().getResource(/ + "markdown" + /).getPath().length).dropRight(3)
+          val fileName = file.getPath().drop(markdownRoute.getPath().length).dropRight(3)
           Document.render(fileName)
       }
     }
