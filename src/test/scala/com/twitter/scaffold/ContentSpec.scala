@@ -12,15 +12,14 @@ import com.twitter.scaffold.Document
 
 class ContentSpec extends WordSpec with MustMatchers {
   
-  def allDirectories(path: File): List[File] = path :: path.listFiles.filter {
-    _.isDirectory
-  }.toList.flatMap {
-    allDirectories(_)
+  def allFilesInDirectory(path: File): List[File] = path.listFiles.toList.flatMap {file =>
+    if (file.isDirectory) allFilesInDirectory(file)
+    else List(file)
   }
 
-  def allFilesInDirectories(directories: List[File]) = directories flatMap {
+  /*def allFilesInDirectories(directories: List[File]) = directories flatMap {
     oneFile => oneFile.listFiles.filter { !_.isDirectory }
-  }
+  }*/
 
   private[this] val / = sys.props("file.separator")
   private[this] val markdownDirectory = / + "markdown" + /
@@ -31,13 +30,11 @@ class ContentSpec extends WordSpec with MustMatchers {
 
     "be parsable by the markdown parser" in {
       val mainFile = new File(getClass().getResource(/ + "markdown" + /).getPath())
-      allFilesInDirectories(allDirectories(mainFile)).filter {
-        _.getName.endsWith(".md")
-      } map {
-        _.getPath().drop(getClass().getResource(/ + "markdown" + /).getPath().length).dropRight(3)
-      } map {
-        Document.render(_)
-      } 
+      allFilesInDirectory(mainFile).collect {
+        case file if file.getName.endsWith(".md") => 
+          val fileName = file.getPath().drop(getClass().getResource(/ + "markdown" + /).getPath().length).dropRight(3)
+          Document.render(fileName)
+      }
     }
   }
   
