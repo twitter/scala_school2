@@ -10,7 +10,7 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
   "scaffold" should {
     "respond to GET /" in {
       Get("/") ~> route ~> check {
-        entityAs[String] must not be 'empty
+        entityAs[String] must not have length (0)
       }
     }
   }
