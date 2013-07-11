@@ -6,8 +6,8 @@ import org.scalatest.matchers.MustMatchers
 import com.twitter.scaffold.Document
 
 // Testing documentation
-// http://doc.scalatest.org/1.9/org/scalatest/WordSpec.html
-// http://doc.scalatest.org/1.9/org/scalatest/matchers/MustMatchers.html
+// http://doc.scalatest.org/1.9.1/org/scalatest/WordSpec.html
+// http://doc.scalatest.org/1.9.1/org/scalatest/matchers/MustMatchers.html
 
 class ContentSpec extends WordSpec with MustMatchers {
   
