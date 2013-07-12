@@ -11,28 +11,25 @@ import com.twitter.scaffold.Document
 
 class ContentSpec extends WordSpec with MustMatchers {
   
-  def allFilesInDirectory(path: File): Seq[File] = path.listFiles() flatMap { file =>
-    if (file.isDirectory) allFilesInDirectory(file)
-    else Seq(file)
+  private[this] val / = sys.props("file.separator")
+  private[this] def markdownRoot() = new File(getClass().getResource(/ + "markdown").getPath)
+  private[this] def allMarkdownFiles() = {
+    def allFilesInDirectory(root: File, prefix: String): Seq[String] = root.listFiles() flatMap {
+      case file if file.isDirectory =>
+        allFilesInDirectory(file, prefix + / + file.getName)
+      case file if file.getName.endsWith(".md") =>
+        Seq(prefix + / + file.getName.stripSuffix(".md"))
+    }
+    allFilesInDirectory(markdownRoot, "")
   }
 
-  private[this] val markdownRoot = getClass().getResource("/markdown")
-  private[this] def markdownDirectory = new File(markdownRoot.getPath())
   "A resource directory" must {
-    "exist" in {
-      markdownRoot must not be (null)
-    }
-
     "not be empty" in {
-      allFilesInDirectory(markdownDirectory) filter {_.getName.endsWith(".md")} must not have length (0)
+      allMarkdownFiles() must not be 'empty
     }
 
     "have valid markdown resources" in {
-      allFilesInDirectory(markdownDirectory) collect {
-        case file if file.getName.endsWith(".md") => 
-          val fileName = file.getPath().stripPrefix(markdownRoot.getPath()).stripSuffix(".md")
-          Document.render(fileName)
-      }
+      allMarkdownFiles() foreach { Document.render }
     }
   }  
 }
