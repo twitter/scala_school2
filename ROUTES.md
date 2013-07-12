@@ -12,12 +12,12 @@
 
   * **GET**: render lesson (twirl + markdown)
 
-* **/console**
+* **/interpreter**
 
   * **POST**: Create a new sub-resource representing a session.
 
       Should respond with 201 CREATED, or 403 FORBIDDEN if somebody's spamming.
-* **/console/{id}**
+* **/interpreter/{id}**
 
   * **POST**: send code to be interpreted.
 
@@ -27,7 +27,7 @@
 
       Should return 204 NO CONTENT normally, 404 NOT FOUND if the session id doesn't exist.
 
-* **/console/{id}/completions/{string}**
+* **/interpreter/{id}/completions/{string}**
   * **GET**: submit a partial string identifier for autocompletions.
 
       Should respond with 200 OK (media type application/json) containing an array of completions, or 404 NOT FOUND if the session id doesn't exist.
