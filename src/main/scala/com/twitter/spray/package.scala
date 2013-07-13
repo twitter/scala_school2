@@ -3,7 +3,10 @@ package com.twitter
 package object spray {
 
   import akka.actor.{ Actor, ActorRef, ActorRefFactory, Props }
-  import _root_.spray.routing.{ RequestContext, Route }
+  import _root_.spray.http.HttpHeaders.Location
+  import _root_.spray.http.StatusCodes.Created
+  import _root_.spray.routing.{ Directives, RequestContext, Route }
+  import Directives._
 
   class Continuation(run: PartialFunction[Any, Route], ctx: RequestContext) extends Actor {
     def receive = run andThen {
@@ -28,5 +31,10 @@ package object spray {
   implicit class MessageOps(message: Any)(implicit factory: ActorRefFactory) {
     def -!>(ref: ActorRef): AndThen = new AndThen(message, ref, factory)
   }
+
+  def created(location: String): Route =
+    respondWithSingletonHeader(Location(location)) {
+      complete { Created }
+    }
 
 }

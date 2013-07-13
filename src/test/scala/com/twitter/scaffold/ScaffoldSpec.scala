@@ -9,6 +9,7 @@ import spray.testkit.ScalatestRouteTest
 
 class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest with ScaffoldService {
   override def actorRefFactory = system
+  override lazy val interpreters = system.actorOf(InterpreterSupervisor.props(10 minutes))
   implicit val routeTestTimeout = RouteTestTimeout(10 seconds) 
 
   "The assets route" should {
@@ -48,8 +49,6 @@ class ScaffoldSpec extends WordSpec with MustMatchers with ScalatestRouteTest wi
       Post("/interpreter","") ~> sealRoute(interpreterRoute) ~> check {
         status must be (Created)
         header("Location") must be ('defined)
-        // Get the Option value and then get the HttpHeader Value
-        header("Location").value.value must fullyMatch regex ("""^/interpreter/(\d+)$""")
       }
     }
 
