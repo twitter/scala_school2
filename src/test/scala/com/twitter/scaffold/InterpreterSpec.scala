@@ -1,39 +1,40 @@
 package com.twitter.scaffold
 
 import akka.actor.{ ActorRef, ActorSystem, PoisonPill, Props }
+import akka.pattern.ask
 import akka.testkit.{ ImplicitSender, TestActorRef, TestKit }
+import akka.util.Timeout
+import concurrent.Await
+import concurrent.duration._
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, WordSpec }
 import org.scalatest.matchers.MustMatchers
-import scala.concurrent.duration._
+import util.{Try, Success, Failure}
 
-class InterpreterSpec(_system: ActorSystem)
-    extends TestKit(_system)
-    with WordSpec
+class InterpreterSpec
+    extends WordSpec
     with MustMatchers
-    with ImplicitSender
-    with BeforeAndAfterEach
-    with BeforeAndAfterAll {
+    with BeforeAndAfterEach {
 
+  implicit val timeout: Timeout = 10 seconds
   private[this] var testInterpreter:ActorRef = _
 
-  def this() = this(ActorSystem("InterpreterSpec"))
+  implicit val system = ActorSystem("IntepreterSpec")
+  import system._
 
   def interpretShouldSucceed(request: String, response: String) {
-    testInterpreter ! Interpreter.Interpret(request)
-    val responseString = receiveOne(20 seconds) match {
-      case Interpreter.Success(resp) => resp
-      case _ => "FAILED"
+    val responseFuture = testInterpreter ? Interpreter.Interpret(request)
+    Await.result(responseFuture, 10 seconds) match {
+      case Interpreter.Success(resp) => resp must include (response)
+      case _ => assert(false, "Interpreter did not return Success")
     }
-    responseString must include (response)
   }
 
-  def interpretShouldFail(request: String, response: String) {
-    testInterpreter ! Interpreter.Interpret(request)
-    val responseString = receiveOne(20 seconds) match {
-      case Interpreter.Failure(resp) => resp
-      case _ => "SUCCEEDED"
+  def interpretShouldFail(request: String, response: String) = {
+    val responseFuture = testInterpreter ? Interpreter.Interpret(request)
+    Await.result(responseFuture, 10 seconds) match {
+      case Interpreter.Failure(resp) => resp must include (response)
+      case _ => assert(false, "Interpreter did not return Failure")
     }
-    responseString must include (response)
   }
 
   override def beforeEach() {
@@ -42,10 +43,6 @@ class InterpreterSpec(_system: ActorSystem)
 
   override def afterEach() {
     testInterpreter ! PoisonPill
-  }
-
-  override def afterAll() {
-    TestKit.shutdownActorSystem(system)
   }
 
   "The Interpreter" should {
