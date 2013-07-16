@@ -9,11 +9,11 @@ class Interpreter extends Actor {
   import scala.tools.nsc._
   import scala.tools.nsc.interpreter._
 
-  private[this] val interpreter = new IMain({
+  private[this] val interpreter = {
     val settings = new Settings
     settings.usejavacp.value = true
-    settings
-  })
+    new IMain(settings)
+  }
 
   private[this] val completion = new JLineCompletion(interpreter)
 
