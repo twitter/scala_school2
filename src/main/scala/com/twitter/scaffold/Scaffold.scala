@@ -3,10 +3,10 @@ package com.twitter.scaffold
 import akka.actor._
 import akka.event.Logging.InfoLevel
 import akka.io.IO
+import concurrent.duration._
 import com.twitter.spray._
 import spray.can.Http
 import spray.http._
-import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._
 import spray.httpx.SprayJsonSupport._
 import spray.httpx.TwirlSupport._
@@ -16,14 +16,12 @@ import spray.routing.directives._
 import spray.util._
 
 trait ScaffoldService extends HttpService with CachingDirectives {
+
+  def interpreters: ActorRef
   private[this] def requestCache = routeCache()
-  private[this] val interpreters = collection.mutable.Map.empty[Long, ActorRef]
-  private[this] def withInterpreter(id: Long)(f: ActorRef => Route): Route = {
-    interpreters.get(id) match {
-      case Some(interpreter) => f(interpreter)
-      case None => complete(NotFound)
-    }
-  }
+
+  import Interpreter._
+  import InterpreterSupervisor._
 
   def assetsRoute =
     pathPrefix("assets") {
@@ -51,46 +49,38 @@ trait ScaffoldService extends HttpService with CachingDirectives {
   def interpreterRoute =
     path("interpreter") {
       post {
-        dynamic {
-          val id = util.Random.nextLong().abs
-          val interpreter = actorRefFactory.actorOf(Interpreter.props, "interpreter-%d".format(id))
-          interpreters(id) = interpreter
-          val uri = "/interpreter/%d".format(id)
-          respondWithSingletonHeader(Location(uri)) { complete(Created) }
+        Create -!> interpreters -!> {
+          case Created(id) => created(s"/interpreter/$id")
         }
       }
     } ~
-    path("interpreter" / LongNumber) { id =>
-      post {
-        entity(as[String]) { expression =>
-          withInterpreter(id) { interpreter =>
-            Interpreter.Interpret(expression) -!> interpreter -!> {
-              case Interpreter.Success(message) =>
-                complete { message }
-              case Interpreter.Failure(message) =>
-                respondWithStatus(BadRequest) { complete { message } }
-            }
-          }
-        }
+    path("interpreter" / Segment) { id =>
+      (post & entity(as[String])) { expression =>
+        Request(id, Interpret(expression)) -!> interpreters -!> {
+          case Success(message) =>
+            complete { message }
+          case Failure(message) =>
+            respondWithStatus(BadRequest) { complete { message } }
+          case NoSuchInterpreter =>
+            complete { NotFound }
+        } 
       } ~
       delete {
-        withInterpreter(id) { interpreter =>
-          complete {
-            interpreter ! PoisonPill
-            interpreters -= id
-            NoContent
-          }
+        Destroy(id) -!> interpreters -!> {
+          case Destroyed =>
+            complete { NoContent }
+          case NoSuchInterpreter =>
+            complete { NotFound }
         }
       }
     } ~
-    path("interpreter" / LongNumber / "completions") { id =>
-      post {
-        entity(as[String]) { expression =>
-          withInterpreter(id) { interpreter =>
-            Interpreter.Complete(expression) -!> interpreter -!> {
-              case Interpreter.Completions(results) => complete { results }
-            }
-          }
+    path("interpreter" / Segment / "completions") { id =>
+      (post & entity(as[String])) { expression =>
+        Request(id, Complete(expression)) -!> interpreters -!> {
+          case Completions(results) =>
+            complete { results }
+          case NoSuchInterpreter =>
+            complete { NotFound }
         }
       }
     }
@@ -98,7 +88,7 @@ trait ScaffoldService extends HttpService with CachingDirectives {
   def route = assetsRoute ~ markdownRoute ~ interpreterRoute
 }
 
-class Scaffold extends Actor with ScaffoldService {
+class Scaffold(val interpreters: ActorRef) extends Actor with ScaffoldService {
   override val actorRefFactory = context
   override def receive = runRoute(logRequestResponse("scaffold", InfoLevel) { route })
 }
@@ -106,8 +96,10 @@ class Scaffold extends Actor with ScaffoldService {
 object Scaffold extends App {
   implicit val system = ActorSystem("scaffold-system")
 
-  val props = Props[Scaffold]
-  val scaffold = system.actorOf(props, "scaffold")
+  def props(interpreters: ActorRef) = Props(classOf[Scaffold], interpreters)
+
+  val interpreters = system.actorOf(InterpreterSupervisor.props(10 minutes), "interpreter-supervisor")
+  val scaffold = system.actorOf(props(interpreters), "scaffold")
   val flags = Flags(args)
 
   {
