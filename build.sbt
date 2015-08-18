@@ -4,7 +4,7 @@ organization := "com.twitter"
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.10.4"
 
 resolvers += "spray repo" at "http://repo.spray.io"
 
@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "io.spray"          %% "spray-json"     % "1.2.5"     % "compile",
   "io.spray"          %  "spray-routing"  % "1.2-M8"    % "compile",
   "org.pegdown"       %  "pegdown"        % "1.4.0"     % "compile",
-  "org.scala-lang"    %  "scala-compiler" % "2.10.2"    % "compile",
+  "org.scala-lang"    %  "scala-compiler" % "2.10.4"    % "compile",
   "org.webjars"       %  "bootstrap"      % "2.3.2"     % "runtime",
   "org.webjars"       %  "codemirror"     % "3.14"      % "runtime",
   "org.webjars"       %  "html5shiv"      % "3.6.2"     % "runtime",
