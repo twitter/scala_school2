@@ -10,7 +10,13 @@ We aim to eventually provide this as a high availability public service, hosted 
 
 ## Running
 
-`sbt run` will start an HTTP server on port 8080.
+Install [sbt](http://www.scala-sbt.org/) if you haven't already. `sbt` is a build tool for Scala.
+
+`sbt run` will start an HTTP server on port 8080. (The first time you run it, it will first download and compile many things.)
+
+**Troubleshooting**
+
+If `sbt run` prompts you for a Name, Version, and Scala version, then you're using an old `sbt`. Install a newer one.
 
 ## License
 
