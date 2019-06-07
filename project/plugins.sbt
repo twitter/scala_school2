@@ -1,4 +1,4 @@
-resolvers += "spray repo" at "http://repo.spray.io"
+resolvers += "spray repo" at "https://repo.spray.io"
 
 addSbtPlugin("io.spray" % "sbt-revolver" % "0.7.2")
 
